@@ -21,6 +21,7 @@ router.get('/', function(req, res) {
     }
     //get next draw
     function getNextDraw(){
+        console.log("========= getting next draw ==========");
         df = new Q.defer();
         req.getConnection(function(err,connection){
             if(err){
@@ -41,6 +42,7 @@ router.get('/', function(req, res) {
 
     //save next draw + 5 minutes
     function saveNextDraw(currentDraw){
+        console.log("========= saving next draw ==========");
         df = new Q.defer();
         req.getConnection(function(err,connection){
             if(err){
@@ -63,6 +65,7 @@ router.get('/', function(req, res) {
     }
     //Create and save new draw
     function newDraw(input){
+       console.log("========= create draw ==========");
        numbers = [];
        df = new Q.defer();
        req.getConnection(function(err,connection){
@@ -119,6 +122,7 @@ router.get('/', function(req, res) {
 
    //retrieve bets
    function retrieveActiveBets(input){
+       console.log("========= retrieving acitve bets ==========");
        numbers = [];
        df = new Q.defer();
        req.getConnection(function(err,connection){
@@ -165,7 +169,6 @@ router.get('/', function(req, res) {
                           if(err){
                               df.reject(errorFunction(err));
                           } else {
-                              console.log(bets);
                               input.bets = bets;
                               df.resolve(input);
                           }
@@ -179,8 +182,8 @@ router.get('/', function(req, res) {
 
     //checkBets
     function checkBets(input){
+          console.log("========= checking bets ==========");
           df = new Q.defer();
-          console.log(input);
           drawNumbers = input.drawNumbers;
           input.bets.forEach(function(bet, index){
                console.log(bet.betId);
@@ -206,6 +209,7 @@ router.get('/', function(req, res) {
                                  } else {
                                    bet.returnRate = 0;
                                  }
+                                 delete bet.betNumbers;
                                  if (index+1 == input.bets.length){
                                      df.resolve(input);
                                  }
@@ -217,6 +221,50 @@ router.get('/', function(req, res) {
           });
           return df.promise;
     }
+
+    //update bets
+    function updateBets(input){
+          console.log("========= update bets ==========");
+          df = new Q.defer();
+          drawNumbers = input.drawNumbers;
+          input.bets.forEach(function(bet, index){
+               req.getConnection(function(err,connection){
+                   if(err){
+                      df.reject(errorFunction(err));
+                   } else {
+                      newBet = bet;
+                      delete bet.id;
+                      newBet.drawDateTime = input.drawDateTime;
+                      queries.push("insert into bets_archive set ?");
+                      connection.query(query, newBet, function(err, archiveBet)     {
+                             if(err){
+                                 df.reject(errorFunction(err));
+                             }
+                       });
+                       if (bet.draws =  bet.repeatedDraws){
+                           query = "delete from active_bets where betId = " + bet.betId;
+                           connection.query(query, function(err, archiveBet)     {
+                                 if(err){
+                                     df.reject(errorFunction(err));
+                                 }
+                           });
+                       } else {
+                          query = "update active_bets set ?";
+                          connection.query(query, newBet, function(err, archiveBet)     {
+                                 if(err){
+                                     df.reject(errorFunction(err));
+                                 }
+                          });
+                       }
+                   }
+               });
+               if (index + 1 == input.bets.length){
+                    df.resolve(input.bets.length + " bets checked");
+               }
+          });
+          return df.promise;
+    }
+
     Q().then(function(result){
             return getNextDraw();
      }).then(function(result){
@@ -226,7 +274,10 @@ router.get('/', function(req, res) {
      }).then(function(result){
             return retrieveActiveBets(result);
      }).then(function(result){
+            console.log(result.bets.length + " bets retrieved");
             return checkBets(result);
+     }).then(function(result){
+            return updateBets(result);
      }).then(function(result){
         res.status(200).send(result);
     }).catch(function(result){
