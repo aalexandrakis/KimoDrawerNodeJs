@@ -21,7 +21,7 @@ router.get('/', function(req, res) {
     }
     //get next draw
     function getNextDraw(){
-        console.log("========= getting next draw ==========");
+        console.log("========= getting next draw");
         df = new Q.defer();
         req.getConnection(function(err,connection){
             if(err){
@@ -42,7 +42,6 @@ router.get('/', function(req, res) {
 
     //save next draw + 5 minutes
     function saveNextDraw(currentDraw){
-        console.log("========= saving next draw ==========");
         df = new Q.defer();
         req.getConnection(function(err,connection){
             if(err){
@@ -56,6 +55,7 @@ router.get('/', function(req, res) {
                     if(err){
                         df.reject(errorFunction(err));
                     } else {
+                        console.log("========= next draw at " + nextDrawString);
                         df.resolve({'currentDraw':currentDraw, 'nextDraw':nextDraw});
                     }
                 });
@@ -65,7 +65,7 @@ router.get('/', function(req, res) {
     }
     //Create and save new draw
     function newDraw(input){
-       console.log("========= create draw ==========");
+       console.log("========= create draw ");
        numbers = [];
        df = new Q.defer();
        req.getConnection(function(err,connection){
@@ -122,7 +122,7 @@ router.get('/', function(req, res) {
 
    //retrieve bets
    function retrieveActiveBets(input){
-       console.log("========= retrieving acitve bets ==========");
+       console.log("========= retrieving active bets ");
        numbers = [];
        df = new Q.defer();
        req.getConnection(function(err,connection){
@@ -182,11 +182,10 @@ router.get('/', function(req, res) {
 
     //checkBets
     function checkBets(input){
-          console.log("========= checking bets ==========");
+          console.log("========= checking bets");
           df = new Q.defer();
           drawNumbers = input.drawNumbers;
           input.bets.forEach(function(bet, index){
-               console.log(bet.betId);
                matches = 0;
                bet.betNumbers.split("/").forEach(function(number){
                    if(drawNumbers.indexOf(number) > -1){
@@ -224,43 +223,71 @@ router.get('/', function(req, res) {
 
     //update bets
     function updateBets(input){
-          console.log("========= update bets ==========");
+          console.log("========= updating bets");
           df = new Q.defer();
           drawNumbers = input.drawNumbers;
           input.bets.forEach(function(bet, index){
                req.getConnection(function(err,connection){
-                   if(err){
+                   if(err){ //getConnection error
                       df.reject(errorFunction(err));
-                   } else {
+                   } else { //getConnection next
                       newBet = bet;
                       delete bet.id;
-                      newBet.drawDateTime = input.drawDateTime;
-                      queries.push("insert into bets_archive set ?");
-                      connection.query(query, newBet, function(err, archiveBet)     {
-                             if(err){
-                                 df.reject(errorFunction(err));
-                             }
-                       });
-                       if (bet.draws =  bet.repeatedDraws){
-                           query = "delete from active_bets where betId = " + bet.betId;
-                           connection.query(query, function(err, archiveBet)     {
+                      newBet.drawTimeStamp = input.drawDateTime;
+                      connection.beginTransaction(function(err)     {
+                          if(err){ //begin transaction error
+                               df.reject(errorFunction(err));
+                          } else { //begin transaction next
+                              query="insert into bets_archive set ?";
+                              connection.query(query, newBet, function(err, insertResult)     {
                                  if(err){
-                                     df.reject(errorFunction(err));
+                                     connection.rollback(function(){
+                                        console.log("Rollback on insert for betId " + newBet.betId + " " + err);
+                                     });
+                                 } else {
+                                     console.log(insertResult);
                                  }
-                           });
-                       } else {
-                          query = "update active_bets set ?";
-                          connection.query(query, newBet, function(err, archiveBet)     {
-                                 if(err){
-                                     df.reject(errorFunction(err));
-                                 }
-                          });
-                       }
+                              });
+
+                              if (newBet.draws ==  newBet.repeatedDraws){
+                                 query1 = "delete from active_bets where betId = " + newBet.betId;
+                                 connection.query(query1, function(err, deleteResult)     {
+                                       if(err){
+                                         connection.rollback(function(){
+                                            console.log("Rollback on delete for betId " + newBet.betId + " " + err);
+                                         });
+                                       }else{
+                                          console.log(deleteResult);
+                                       }
+                                 });
+                              } else {
+                                 query2 = "update active_bets set ? where betId = " + newBet.betId;
+                                 connection.query(query2, newBet, function(err, updateResult)     {
+                                        if(err){
+                                         connection.rollback(function(){
+                                            console.log("Rollback on update for betId " + newBet.betId + " " + err);
+                                         });
+                                        }else{
+                                            console.log(updateResult);
+                                        }
+                                 });
+                              }
+                              connection.commit(function(err)     {
+                                  if(err){
+                                      connection.rollback(function(){
+                                        console.log("Rollback on commit for betId " + newBet.betId + " " + err);
+                                      });
+                                  }else{
+                                      console.log("trans for betId");
+                                  }
+                              });
+                              if (index + 1 == input.bets.length){
+                                  df.resolve("========= " +input.bets.length + " bets checked");
+                              }
+                          }
+                      });
                    }
-               });
-               if (index + 1 == input.bets.length){
-                    df.resolve(input.bets.length + " bets checked");
-               }
+              });
           });
           return df.promise;
     }
@@ -274,7 +301,7 @@ router.get('/', function(req, res) {
      }).then(function(result){
             return retrieveActiveBets(result);
      }).then(function(result){
-            console.log(result.bets.length + " bets retrieved");
+            console.log("========= " + result.bets.length + " bets retrieved");
             return checkBets(result);
      }).then(function(result){
             return updateBets(result);
