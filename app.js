@@ -3,12 +3,13 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
 
-var routes = require('./routes/index');
-var users = require('./routes/users');
+var signIn = require('./routes/signIn');
+var signOut = require('./routes/signOut');
 var drawer = require('./routes/drawer');
 
 var app = express();
@@ -23,6 +24,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(cookieSession({secret: '9834306712alexik'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
@@ -35,12 +37,23 @@ app.use(
         port : 3306, //port mysql
         database:'kimo'
     },'request')
-);//route index, hello world
+);
 
+app.use(function (req, res, next) {
+    if (req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
+        res.sendFile(path.resolve() +"/public/partials/index.html");
+  	} else {
+         next();
+  	}
+});
 
-app.use('/', routes);
-app.use('/users', users);
-app.use('/drawer', drawer);
+app.get('/', function(req, res){
+    res.sendFile(path.resolve() +"/public/partials/index.html");
+});
+
+app.use('/signIn', signIn);
+app.use('/signOut', signOut);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -49,6 +62,7 @@ app.use(function(req, res, next) {
     next(err);
 });
 
+
 // error handlers
 
 // development error handler
@@ -56,7 +70,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.send({
             message: err.message,
             error: err
         });
@@ -67,7 +81,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.send({
         message: err.message,
         error: {}
     });

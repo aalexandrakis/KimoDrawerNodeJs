@@ -1,0 +1,44 @@
+          <div class="row" >
+            <div class="col-md-6 col-md-offset-3">
+              <div class="login-panel panel panel-default" style="margin-top: 0">
+                <div class="panel-heading">
+                  {{formHeader}}
+                </div>
+                <div class=panel-body>
+                  <form class="form-horizontal">
+                    <fieldset>
+                      <div ng-class="userNameGroup">
+                        <label class="col-md-2 control-label"> User Name </label>
+                        <div class="col-md-10">
+                          <input class="form-control" placeholder="User Name" type="text" ng-model="userName">
+                          <label class="control-label">{{userNameError}}</label>
+                        </div>
+                      </div>
+
+                      <div ng-class="passwordGroup">
+                        <label class="col-md-2 control-label"> User Name </label>
+                        <div class="col-md-10">
+                          <input class="form-control"  placeholder="Password" type="password" ng-model="password">
+                          <label class="control-label">{{passwordError}}</label>
+                        </div>
+                      </div>
+
+                      <div>
+                        <input type="button" class="btn btn-lg btn-block btn-success"  value="Sign In" ng-click="login(userName, password)"/>
+                      </div>
+                    </fieldset>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <div class="row" ng-style="errorMessageGroup">
+            <div class="col-md-6 col-md-offset-3">
+              <div class="bs-component">
+                <div class="alert alert-dismissable alert-danger">
+                  <strong>{{errorMessage}}</strong>
+                </div>
+                <div style="display: none;" id="source-button" class="btn btn-primary btn-xs">&lt; &gt;</div>
+              </div>
+            </div>
+          </div>
+        </div>
