@@ -11,7 +11,7 @@ var engine = Random.engines.mt19937().autoSeed();
 var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
-router.get('/', function(req, res) {
+router.post('/', function(req, res) {
 
     function errorFunction(err){
         error = new Error();
@@ -40,8 +40,12 @@ router.get('/', function(req, res) {
         return df.promise;
     }
 
+
     //save next draw + 5 minutes
     function saveNextDraw(currentDraw){
+
+        currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
+//        console.log("bbbbb " + currentDraw);
         df = new Q.defer();
         req.getConnection(function(err,connection){
             if(err){
@@ -292,10 +296,10 @@ router.get('/', function(req, res) {
           return df.promise;
     }
 
-    Q().then(function(result){
-            return getNextDraw();
-     }).then(function(result){
-            return saveNextDraw(result);
+//    Q().then(function(result){
+//            return getNextDraw();
+     Q().then(function(result){
+            return saveNextDraw(req.body.drawDate);
      }).then(function(result){
             return newDraw(result);
      }).then(function(result){

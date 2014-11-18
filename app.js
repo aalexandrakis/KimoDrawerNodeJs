@@ -47,13 +47,15 @@ app.use(function (req, res, next) {
   	}
 });
 
-app.get('/', function(req, res){
-    res.sendFile(path.resolve() +"/public/partials/index.html");
-});
+
 
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
+app.use('/drawer', drawer);
 
+app.get('/', function(req, res){
+    res.sendFile(path.resolve() +"/public/partials/index.html");
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
