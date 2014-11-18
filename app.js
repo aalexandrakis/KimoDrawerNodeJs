@@ -11,6 +11,7 @@ var mysql = require('mysql');
 var signIn = require('./routes/signIn');
 var signOut = require('./routes/signOut');
 var drawer = require('./routes/drawer');
+var testBets = require('./routes/testBets');
 
 var app = express();
 
@@ -52,6 +53,7 @@ app.use(function (req, res, next) {
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
 app.use('/drawer', drawer);
+app.use('/testBets', testBets);
 
 app.get('/', function(req, res){
     res.sendFile(path.resolve() +"/public/partials/index.html");

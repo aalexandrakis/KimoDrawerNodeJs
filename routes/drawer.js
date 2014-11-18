@@ -228,72 +228,46 @@ router.post('/', function(req, res) {
           return df.promise;
     }
 
-    //update bets
     function updateBets(input){
-          console.log("========= updating bets");
-          df = new Q.defer();
-          drawNumbers = input.drawNumbers;
-          if (input.bets.length == 0){
-              df.resolve(input);
-          }
-          input.bets.forEach(function(bet, index){
-               req.getConnection(function(err,connection){
-                   if(err){ //getConnection error
-                      df.reject(errorFunction(err));
-                   } else { //getConnection next
-                      newBet = bet;
-                      delete bet.id;
-                      newBet.drawTimeStamp = input.drawDateTime;
-                      connection.beginTransaction(function(err)     {
-                          if(err){ //begin transaction error
-                               df.reject(errorFunction(err));
-                          } else { //begin transaction next
-                              query="insert into bets_archive set ?";
-                              connection.query(query, newBet, function(err, insertResult)     {
-                                 if(err){
-                                     connection.rollback(function(){
-                                        console.log("Rollback on insert for betId " + newBet.betId + " " + err);
-                                     });
-                                 }
-                              });
+        df = new Q.defer()
+        bets = input.bets;
+        req.getConnection(function(err,connection){
+            if(err)
+                console.error("Process stopped due to an error in inserting bets to archive table");
+             bets.forEach(function(bet, index){
+                delete bet.id;
+                bet.drawTimeStamp = input.drawDateTime;
+                query="insert into bets_archive set ?";
+                connection.query(query, bet, function(err, insertResult)     {
+                    if(err)
+                        console.log("Could not insert betId " + bet.betId + " " + err);
+                        if (bet.repeatedDraws == bet.draws){
+                            console.log("on delete ", bet.betId);
+                            query="delete from active_bets where betId = " + bet.betId;
+                            connection.query(query, function(err, insertResult)     {
+                                if(err)
+                                    console.log("Could not delete betId " + bet.betId + " " + err);
+                                    if(index + 1 == bets.length) {
+                                            console.log("resolved");
+                                           df.resolve(input);
+                                    }
+                            });
+                        } else {
+                            query="update active_bets set ? where betId = " + bet.betId;
+                            connection.query(query, bet, function(err, insertResult)     {
+                                if(err)
+                                    console.log("Could not update betId " + bet.betId + " " + err);
+                                    if(index + 1 == bets.length) {
+                                            console.log("resolved");
+                                           df.resolve("ok");
+                                    }
+                            });
+                        }
+                });
 
-                              if (newBet.draws ==  newBet.repeatedDraws){
-                                 query1 = "delete from active_bets where betId = " + newBet.betId;
-                                 connection.query(query1, function(err, deleteResult)     {
-                                       if(err){
-                                         connection.rollback(function(){
-                                            console.log("Rollback on delete for betId " + newBet.betId + " " + err);
-                                         });
-                                       }
-                                 });
-                              } else {
-                                 query2 = "update active_bets set ? where betId = " + newBet.betId;
-                                 connection.query(query2, newBet, function(err, updateResult)     {
-                                        if(err){
-                                         connection.rollback(function(){
-                                            console.log("Rollback on update for betId " + newBet.betId + " " + err);
-                                         });
-                                        }
-                                 });
-                              }
-                              connection.commit(function(err)     {
-                                  if(err){
-                                      connection.rollback(function(){
-                                        console.log("Rollback on commit for betId " + newBet.betId + " " + err);
-                                      });
-                                  }else{
-                                      console.log("trans for betId " + newBet.betId + " completed");
-                                  }
-                              });
-                              if (index + 1 == input.bets.length){
-                                  df.resolve("========= " +input.bets.length + " bets checked");
-                              }
-                          }
-                      });
-                   }
-              });
-          });
-          return df.promise;
+            });
+        });
+        return df.promise;
     }
 
 //    Q().then(function(result){
@@ -310,6 +284,7 @@ router.post('/', function(req, res) {
      }).then(function(result){
             return updateBets(result);
      }).then(function(result){
+         console.log("========= bets updated");
         res.status(200).send(result);
     }).catch(function(result){
         res.status(500).send(error);

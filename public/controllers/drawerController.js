@@ -16,7 +16,6 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
   }
 
   $scope.makeDraw = function(){
-        console.log("i am here");
       $http({
              url: '/drawer',
              method: "POST",
