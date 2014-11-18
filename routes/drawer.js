@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
     function errorFunction(err){
         error = new Error();
         error.status = 500;
-        error.message = err;
+        error.message = "=======================" + err;
         return error;
     }
     //get next draw
@@ -185,6 +185,9 @@ router.get('/', function(req, res) {
           console.log("========= checking bets");
           df = new Q.defer();
           drawNumbers = input.drawNumbers;
+          if (input.bets.length == 0){
+            df.resolve(input);
+          }
           input.bets.forEach(function(bet, index){
                matches = 0;
                bet.betNumbers.split("/").forEach(function(number){
@@ -226,6 +229,9 @@ router.get('/', function(req, res) {
           console.log("========= updating bets");
           df = new Q.defer();
           drawNumbers = input.drawNumbers;
+          if (input.bets.length == 0){
+              df.resolve(input);
+          }
           input.bets.forEach(function(bet, index){
                req.getConnection(function(err,connection){
                    if(err){ //getConnection error
@@ -244,8 +250,6 @@ router.get('/', function(req, res) {
                                      connection.rollback(function(){
                                         console.log("Rollback on insert for betId " + newBet.betId + " " + err);
                                      });
-                                 } else {
-                                     console.log(insertResult);
                                  }
                               });
 
@@ -256,8 +260,6 @@ router.get('/', function(req, res) {
                                          connection.rollback(function(){
                                             console.log("Rollback on delete for betId " + newBet.betId + " " + err);
                                          });
-                                       }else{
-                                          console.log(deleteResult);
                                        }
                                  });
                               } else {
@@ -267,8 +269,6 @@ router.get('/', function(req, res) {
                                          connection.rollback(function(){
                                             console.log("Rollback on update for betId " + newBet.betId + " " + err);
                                          });
-                                        }else{
-                                            console.log(updateResult);
                                         }
                                  });
                               }
@@ -278,7 +278,7 @@ router.get('/', function(req, res) {
                                         console.log("Rollback on commit for betId " + newBet.betId + " " + err);
                                       });
                                   }else{
-                                      console.log("trans for betId");
+                                      console.log("trans for betId " + newBet.betId + " completed");
                                   }
                               });
                               if (index + 1 == input.bets.length){
