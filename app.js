@@ -16,6 +16,7 @@ var tests = require('./routes/tests');
 
 var app = express();
 
+global.users = {};
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

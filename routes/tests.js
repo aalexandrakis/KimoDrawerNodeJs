@@ -29,5 +29,10 @@ router.get('/', function(req, res) {
 	   res.send("Matches " + matches);
 });
 
+router.get('/getApp', function(req, res) {
+//	   res.send("users from req" + req.getUsers);
+	   res.send("users from app" + global.users);
+});
+
 
 module.exports = router;
