@@ -193,36 +193,42 @@ router.post('/', function(req, res) {
             df.resolve(input);
           }
           input.bets.forEach(function(bet, index){
-               matches = 0;
-               bet.betNumbers.split("/").forEach(function(number){
-                   if(drawNumbers.indexOf(number) > -1){
-                       matches++;
+               bet.betNumbers.split(",").forEach(function(number, indexNumbers){
+                   if (bet.matches == null){
+                        bet.matches = 0;
                    }
-               })
-               bet.matches = matches;
-               bet.draws++;
-               req.getConnection(function(err,connection){
-                   if(err){
-                      df.reject(errorFunction(err));
-                   } else {
-                      query = "select returnRate from rates where gameType = " + bet.gameType + " and matches = " + bet.matches;
-                      connection.query(query, result, function(err, returnRate)     {
-                             if(err){
-                                 df.reject(errorFunction(err));
-                             } else {
-                                 if(returnRate.length > 0){
-                                   bet.returnRate = returnRate[0].returnRate;
-                                 } else {
-                                   bet.returnRate = 0;
-                                 }
-                                 delete bet.betNumbers;
-                                 if (index+1 == input.bets.length){
-                                     df.resolve(input);
-                                 }
-                             }
+                   if(drawNumbers.indexOf(+number) > -1){
+                       bet.matches++;
+                   }
+
+                   if  (indexNumbers == 11){
+                       bet.draws++;
+                       req.getConnection(function(err,connection){
+                           if(err){
+                              df.reject(errorFunction(err));
+                           } else {
+                              query = "select returnRate from rates where gameType = " + bet.gameType + " and matches = " + bet.matches;
+                              connection.query(query, result, function(err, returnRate)     {
+                                     if(err){
+                                         df.reject(errorFunction(err));
+                                     } else {
+                                         if(returnRate.length > 0){
+                                           bet.returnRate = returnRate[0].returnRate;
+                                         } else {
+                                           bet.returnRate = 0;
+                                         }
+                                         delete bet.betNumbers;
+                                         if (index+1 == input.bets.length){
+                                             df.resolve(input);
+                                         }
+                                     }
+                               });
+                           }
                        });
+
                    }
-               });
+
+               })
 
           });
           return df.promise;
