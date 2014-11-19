@@ -3,6 +3,7 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
      $scope.formHeader = "Drawer";
      $scope.alerts = [];
 
+  console.log(drawer.globalNextDraw);
   $scope.removeAlert = function(index){
      $scope.alerts.remove(index);
   }

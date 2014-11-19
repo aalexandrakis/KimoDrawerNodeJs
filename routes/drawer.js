@@ -4,7 +4,7 @@ var functions = require('../public/functions.js');
 var router = express.Router();
 var Q = require('q');
 var mysql = require('mysql');
-var globalNextDraw;
+
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'kimo',
@@ -19,6 +19,7 @@ var engine = Random.engines.mt19937().autoSeed();
 // create a distribution that will consistently produce integers within inclusive range [0, 99].
 var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
+
 
 exports.makeOneDraw = function(){
 
@@ -39,7 +40,9 @@ exports.makeOneDraw = function(){
         });
 }
 
-exports.drawTimer;
+exports.drawTimer = false;
+
+exports.globalNextDraw = null;
 
 exports.startDrawer = function(drawDate){
 //        nextDraw = getNextDraw()
