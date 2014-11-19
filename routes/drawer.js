@@ -20,9 +20,26 @@ var engine = Random.engines.mt19937().autoSeed();
 var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
-exports.makeOneDraw = function(drawDate){
-    makeDraw(drawDate);
+exports.makeOneDraw = function(){
+
+         Q().then(function(result){
+                return newDraw(functions.convertDateToMySqlTimeStampString(new Date()));
+         }).then(function(result){
+                return retrieveActiveBets(result);
+         }).then(function(result){
+                console.log("========= " + result.bets.length + " bets retrieved");
+                return checkBets(result);
+         }).then(function(result){
+                return updateBets(result);
+         }).then(function(result){
+             console.log("========= Next Draw at ", globalNextDraw);
+             console.log(result);
+        }).catch(function(error){
+            console.log("========= error ", error);
+        });
 }
+
+exports.drawTimer;
 
 exports.startDrawer = function(drawDate){
 //        nextDraw = getNextDraw()
@@ -31,9 +48,9 @@ exports.startDrawer = function(drawDate){
         setTimeout(function(){
             console.log("Draw starts in ", ((diff / 1000) / 60));
         }, diff);
-        setInterval(function(){
-            makeDraw(globalNextDraw);
-        }, 10000)
+        drawTimer = setInterval(function(){
+                makeDraw(globalNextDraw);
+        }, 300000);
 }
 
     function errorFunction(err){
@@ -61,7 +78,8 @@ exports.startDrawer = function(drawDate){
         df = new Q.defer();
         currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        globalNextDraw = nextDraw;
+        globalNextDraw = functions.convertDateToIsoString(nextDraw);
+        console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
         nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
 
         query = "UPDATE next_draw set nextDraw = '" + nextDrawString + "'";
@@ -252,7 +270,7 @@ exports.startDrawer = function(drawDate){
                                        df.resolve("ok");
                                 }
                         });
-         result           }
+                    }
             });
 
         });
@@ -260,8 +278,6 @@ exports.startDrawer = function(drawDate){
     }
 
 function makeDraw (drawDate){
-//    Q().then(function(result){
-//            return getNextDraw();
      console.log("in the drawer");
      Q().then(function(result){
             return saveNextDraw(drawDate);
@@ -275,11 +291,9 @@ function makeDraw (drawDate){
      }).then(function(result){
             return updateBets(result);
      }).then(function(result){
-         console.log("========= bets updated");
+         console.log("========= Next Draw at ", globalNextDraw);
          console.log(result);
-//        res.status(200).send(result);
     }).catch(function(error){
         console.log("========= error ", error);
-//        res.status(500).send(error);
     });
 }

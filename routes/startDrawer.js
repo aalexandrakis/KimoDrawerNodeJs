@@ -3,12 +3,15 @@ var Random = require('random-js');
 var functions = require('../public/functions.js');
 var router = express.Router();
 
-/* GET login. */
+
+router.get(/\/makeOneDraw/, function(req, res) {
+	global.drawer.makeOneDraw(req.params['drawDate']);
+	res.status(200).send("Drawer started successfully");
+});
+
 router.get('/:drawDate', function(req, res) {
-//	global.drawer.startDrawer("201120142200");
 	global.drawer.startDrawer(req.params['drawDate']);
-	res.send("ok");
-//res.send(global.startDrawer);
+	res.status(200).send("Drawer started successfully");
 });
 
 module.exports = router;

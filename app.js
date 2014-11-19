@@ -46,7 +46,8 @@ app.use(
 );
 
 app.use(function (req, res, next) {
-    if (req.url.indexOf('/startDrawer') != 0 && req.url != '/tests' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
+    //only for test req.url.indexOf('/startDrawer') != 0
+    if (req.url != '/tests' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
         console.log("not authenticated");
         res.sendFile(path.resolve() +"/public/partials/index.html");
   	} else {
