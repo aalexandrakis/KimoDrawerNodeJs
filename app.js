@@ -7,16 +7,19 @@ var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 var connection  = require('express-myconnection');
 var mysql = require('mysql');
+var Drawer = require('./routes/drawer');
 
 var signIn = require('./routes/signIn');
 var signOut = require('./routes/signOut');
-var drawer = require('./routes/drawer');
 var testBets = require('./routes/testBets');
 var tests = require('./routes/tests');
+var startDrawer = require('./routes/startDrawer');
 
 var app = express();
 
+global.drawer = Drawer;
 global.users = {};
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -43,7 +46,8 @@ app.use(
 );
 
 app.use(function (req, res, next) {
-    if (req.url != '/tests' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
+    if (req.url.indexOf('/startDrawer') != 0 && req.url != '/tests' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
+        console.log("not authenticated");
         res.sendFile(path.resolve() +"/public/partials/index.html");
   	} else {
          next();
@@ -54,7 +58,7 @@ app.use(function (req, res, next) {
 
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
-app.use('/drawer', drawer);
+app.use('/startDrawer', startDrawer);
 app.use('/testBets', testBets);
 app.use('/tests', tests);
 
