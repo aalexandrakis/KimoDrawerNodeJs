@@ -12,6 +12,7 @@ var signIn = require('./routes/signIn');
 var signOut = require('./routes/signOut');
 var drawer = require('./routes/drawer');
 var testBets = require('./routes/testBets');
+var tests = require('./routes/tests');
 
 var app = express();
 
@@ -41,7 +42,7 @@ app.use(
 );
 
 app.use(function (req, res, next) {
-    if (req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
+    if (req.url != '/tests' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
         res.sendFile(path.resolve() +"/public/partials/index.html");
   	} else {
          next();
@@ -54,6 +55,7 @@ app.use('/signIn', signIn);
 app.use('/signOut', signOut);
 app.use('/drawer', drawer);
 app.use('/testBets', testBets);
+app.use('/tests', tests);
 
 app.get('/', function(req, res){
     res.sendFile(path.resolve() +"/public/partials/index.html");

@@ -193,16 +193,15 @@ router.post('/', function(req, res) {
             df.resolve(input);
           }
           input.bets.forEach(function(bet, index){
+               matches = 0;
                bet.betNumbers.split(",").forEach(function(number, indexNumbers){
-                   if (bet.matches == null){
-                        bet.matches = 0;
-                   }
                    if(drawNumbers.indexOf(+number) > -1){
-                       bet.matches++;
+                       matches++;
                    }
 
                    if  (indexNumbers == 11){
                        bet.draws++;
+                       bet.matches = matches;
                        req.getConnection(function(err,connection){
                            if(err){
                               df.reject(errorFunction(err));
@@ -248,13 +247,11 @@ router.post('/', function(req, res) {
                     if(err)
                         console.log("Could not insert betId " + bet.betId + " " + err);
                         if (bet.repeatedDraws == bet.draws){
-                            console.log("on delete ", bet.betId);
                             query="delete from active_bets where betId = " + bet.betId;
                             connection.query(query, function(err, insertResult)     {
                                 if(err)
                                     console.log("Could not delete betId " + bet.betId + " " + err);
                                     if(index + 1 == bets.length) {
-                                            console.log("resolved");
                                            df.resolve(input);
                                     }
                             });
@@ -264,7 +261,6 @@ router.post('/', function(req, res) {
                                 if(err)
                                     console.log("Could not update betId " + bet.betId + " " + err);
                                     if(index + 1 == bets.length) {
-                                            console.log("resolved");
                                            df.resolve("ok");
                                     }
                             });
