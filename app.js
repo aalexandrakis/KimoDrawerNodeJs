@@ -15,6 +15,7 @@ var testBets = require('./routes/testBets');
 var tests = require('./routes/tests');
 var drawerService = require('./routes/drawerService');
 var lastDraw = require('./routes/lastDraw');
+var getDrawInfo = require('./routes/getDrawInfo');
 
 var app = express();
 
@@ -61,6 +62,7 @@ app.use('/drawerService', drawerService);
 app.use('/lastDraw', lastDraw);
 app.use('/testBets', testBets);
 app.use('/tests', tests);
+app.use('/getDrawInfo', getDrawInfo);
 
 app.get('/', function(req, res){
     res.sendFile(path.resolve() +"/public/partials/index.html");

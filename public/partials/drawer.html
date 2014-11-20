@@ -22,14 +22,14 @@
                                   autoclose: true
                               });
                         </script>
+                      <div class="col-md-5">
+                          <input ng-hide="isDrawerActive" type="button" class="btn btn-primary" ng-disabled="!isDateValid()" value="Start" ng-click="startDrawer()"/>
+                          <input ng-hide="isDrawerActive" type="button" class="btn btn-info"  ng-click="makeOneDraw()" value="Make a draw now"/>
+                          <input ng-hide="!isDrawerActive" type="button" class="btn btn-danger" value="Stop" ng-click="stopDrawer()"/>
+                      </div>
                   </div>
-                  <div class="row">
-                     <div class="col-md-5">
-                         <input ng-hide="isDrawerActive" type="button" class="btn btn-primary" ng-disabled="!isDateValid()" value="Start" ng-click="startDrawer()"/>
-                         <input ng-hide="isDrawerActive" type="button" class="btn btn-info"  ng-click="makeOneDraw()" value="Make a draw now"/>
-                         <input ng-hide="!isDrawerActive" type="button" class="btn btn-danger" value="Stop" ng-click="stopDrawer()"/>
-                     </div>
-                  </div>
+                    <!--<div class="row">-->
+                  <!--</div>-->
                 </div>
               </div>
             </div>
@@ -42,3 +42,70 @@
                   </div>
               </div>
         </div>
+          <div class="row" >
+              <div class="col-md-10">
+                  <div class="panel panel-default" style="margin-top: 0">
+                      <div class="panel-heading">
+                          Draw Info
+                      </div>
+                      <div class=panel-body>
+                          <div class="row">
+                              <div class="col-md-5">
+                                  <div class="form-group">
+                                      <div class=" input-group date" id="drawInfoDate">
+                                          <!--<label>Date To</label>-->
+                                          <input name="dateTo" placeholder="Date To" class="form-control" type="text" ng-model="drawInfoDate" readonly>
+                                          <span class="input-group-addon"><i class="glyphicon  glyphicon-calendar"></i></span>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="col-md-2">
+                                  <input type="button" class="btn btn-primary" value="Search" ng-click="getDrawInfo()"/>
+                              </div>
+                              <script type="text/javascript">
+                              $('#drawInfoDate').datetimepicker({
+                                  format: "dd-mm-yyyy",
+                                  todayBtn: true,
+                                  autoclose: true
+                              });
+                             </script>
+                              <div class="row">
+                                  <div class="col-md-12">
+                                      <img src="/images/lazy-loading-image.gif" ng-style="lazyLoadStyle"/>
+                                      <table class="table table-striped" ng-style="tableStyle">
+                                          <thead>
+                                          <tr>
+                                              <th>Date/Time</th>
+                                              <th>Bets</th>
+                                              <th>Winning Bets</th>
+                                              <th>Incomes</th>
+                                              <th>Outcomes</th>
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          <tr ng-repeat="info in infos">
+                                              <td >{{info.drawDateTime}}</td>
+                                              <td >{{info.bets}}</td>
+                                              <td >{{info.winningBets}}</td>
+                                              <td >{{info.betsIncome}}</td>
+                                              <td >{{info.betsOutcome}}</td>
+                                          </tr>
+                                          </tbody>
+                                      </table>
+                                      <br/><br/>
+                                      <div class="row" ng-style="errorStyle">
+                                          <div class="col-md-12">
+                                              <div class="alert alert-danger">
+                                                  {{errorMessage}}
+                                              </div>
+                                              <div>
+                                              </div>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>

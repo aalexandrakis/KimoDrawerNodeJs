@@ -50,6 +50,7 @@ exports.globalNextDraw = null;
 exports.startDrawer = function(drawDate){
 //        nextDraw = getNextDraw()
         diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
+//        diff -= 60000;
         globalNextDraw = drawDate;
         global.isDrawerActive = true;
         timeout = setTimeout(function(){
