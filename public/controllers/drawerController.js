@@ -10,6 +10,10 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
      $scope.alerts.remove(index);
   }
 
+  interval1 = $interval(function(){
+                      $scope.alerts = [];
+                    }, 3000, 1);
+
   $scope.isDateValid = function(){
     if (!angular.isUndefined($scope.startDate)){
         return true;

@@ -14,6 +14,7 @@ var signOut = require('./routes/signOut');
 var testBets = require('./routes/testBets');
 var tests = require('./routes/tests');
 var drawerService = require('./routes/drawerService');
+var lastDraw = require('./routes/lastDraw');
 
 var app = express();
 
@@ -57,6 +58,7 @@ app.use(function (req, res, next) {
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
 app.use('/drawerService', drawerService);
+app.use('/lastDraw', lastDraw);
 app.use('/testBets', testBets);
 app.use('/tests', tests);
 
