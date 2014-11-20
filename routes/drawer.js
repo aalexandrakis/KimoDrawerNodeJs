@@ -50,9 +50,11 @@ exports.startDrawer = function(drawDate){
         diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
         globalNextDraw = drawDate;
         global.isDrawerActive = true;
-        setTimeout(function(){
+        timeout = setTimeout(function(){
             console.log("Draw starts in ", ((diff / 1000) / 60));
+            clearTimeout(timeout);
         }, diff);
+
         drawTimer = setInterval(function(){
                 makeDraw(globalNextDraw);
         }, 300000);

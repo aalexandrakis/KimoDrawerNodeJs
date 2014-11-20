@@ -39,7 +39,7 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
        .then(function (response){
               if (response.status == 200){
                   $scope.alerts.push(response.data);
-                  isDrawerActive = true;
+                  $scope.isDrawerActive = true;
               }
        });
   }
@@ -52,7 +52,7 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
          .then(function (response){
                 if (response.status == 200){
                     $scope.alerts.push(response.data);
-                    isDrawerActive = false;
+                    $scope.isDrawerActive = false;
                 }
          });
   }
