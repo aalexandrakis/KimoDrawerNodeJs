@@ -25,9 +25,9 @@
                   </div>
                   <div class="row">
                      <div class="col-md-5">
-                         <input type="button" class="btn btn-primary" ng-disabled="!isDateValid()" value="Start"/>
-                         <input type="button" class="btn btn-info" ng-disabled="!isDateValid()" ng-click="makeDraw()" value="Make a draw now"/>
-                         <input type="button" class="btn btn-danger" value="Stop"/>
+                         <input ng-hide="isDrawerActive" type="button" class="btn btn-primary" ng-disabled="!isDateValid()" value="Start" ng-click="startDrawer()"/>
+                         <input ng-hide="isDrawerActive" type="button" class="btn btn-info"  ng-click="makeOneDraw()" value="Make a draw now"/>
+                         <input ng-hide="!isDrawerActive" type="button" class="btn btn-danger" value="Stop" ng-click="stopDrawer()"/>
                      </div>
                   </div>
                 </div>
@@ -37,7 +37,7 @@
                   <div ng-repeat="alert in alerts">
                       <div class="alert alert-success alert-dismissable" >
                           <button type="button" class="close" ng-click="removeAlert($index)">×</button>
-                          New Draw Ends
+                          {{alert}}
                       </div>
                   </div>
               </div>

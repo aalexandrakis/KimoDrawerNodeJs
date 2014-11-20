@@ -13,12 +13,12 @@ var signIn = require('./routes/signIn');
 var signOut = require('./routes/signOut');
 var testBets = require('./routes/testBets');
 var tests = require('./routes/tests');
-var startDrawer = require('./routes/startDrawer');
+var drawerService = require('./routes/drawerService');
 
 var app = express();
 
 global.drawer = Drawer;
-global.users = {};
+global.isDrawerActive = false;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -56,12 +56,11 @@ app.use(function (req, res, next) {
 
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
-app.use('/startDrawer', startDrawer);
+app.use('/drawerService', drawerService);
 app.use('/testBets', testBets);
 app.use('/tests', tests);
 
 app.get('/', function(req, res){
-    console.log("root");
     res.sendFile(path.resolve() +"/public/partials/index.html");
 });
 

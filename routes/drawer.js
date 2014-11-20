@@ -33,10 +33,11 @@ exports.makeOneDraw = function(){
          }).then(function(result){
                 return updateBets(result);
          }).then(function(result){
-             console.log("========= Next Draw at ", globalNextDraw);
              console.log(result);
+             return {"status":200, "message":"Draw completed successfully successfully"};
         }).catch(function(error){
             console.log("========= error ", error);
+            return {"status":500, "message":"Draw not completed successfully successfully"};
         });
 }
 
@@ -48,12 +49,15 @@ exports.startDrawer = function(drawDate){
 //        nextDraw = getNextDraw()
         diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
         globalNextDraw = drawDate;
+        global.isDrawerActive = true;
         setTimeout(function(){
             console.log("Draw starts in ", ((diff / 1000) / 60));
         }, diff);
         drawTimer = setInterval(function(){
                 makeDraw(globalNextDraw);
         }, 300000);
+        return {"status":200, "message":"Draw completed successfully successfully"};
+
 }
 
     function errorFunction(err){
@@ -277,6 +281,9 @@ exports.startDrawer = function(drawDate){
             });
 
         });
+        if (bets.length == 0){
+            df.resolve(" no bets to process");
+        }
         return df.promise;
     }
 

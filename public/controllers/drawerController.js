@@ -3,7 +3,9 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
      $scope.formHeader = "Drawer";
      $scope.alerts = [];
 
-  console.log(drawer.globalNextDraw);
+
+  getDrawer();
+
   $scope.removeAlert = function(index){
      $scope.alerts.remove(index);
   }
@@ -16,27 +18,66 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
     }
   }
 
-  $scope.makeDraw = function(){
+  $scope.makeOneDraw = function(){
       $http({
-             url: '/drawer',
-             method: "POST",
-             data:{drawDate:  $scope.startDate.replace(/-/g, "").replace(/:/g, "").replace(/ /g, "")}
-       })
+             url: '/drawerService/makeOneDraw',
+             method: "GET"
+         })
        .then(function (response){
-              parseData(response);
-              if (response.status = 200){
+              console.log(response);
+              if (response.status == 200){
                   $scope.alerts.push(response.data);
-                  interval1 = $interval(function(){
-                  }, 3000, 1);
-              } else {
               }
        });
   }
 
+  $scope.startDrawer = function(){
+      $http({
+             url: '/drawerService/startDrawer/' + $scope.startDate.replace(/-/g, "").replace(/:/g, "").replace(/ /g, "") + "00",
+             method: "GET"
+         })
+       .then(function (response){
+              if (response.status == 200){
+                  $scope.alerts.push(response.data);
+                  isDrawerActive = true;
+              }
+       });
+  }
 
-  interval1 = $interval(function(){
-    getInfoData();
-  }, 180000, 0);
+  $scope.stopDrawer = function(){
+        $http({
+               url: '/drawerService/stopDrawer',
+               method: "GET"
+           })
+         .then(function (response){
+                if (response.status == 200){
+                    $scope.alerts.push(response.data);
+                    isDrawerActive = false;
+                }
+         });
+  }
+
+  function getDrawer(){
+        $http({
+               url: '/drawerService/getDrawer',
+               method: "GET"
+           })
+         .then(function (response){
+                console.log(response);
+                if (response.status == 200){
+                    if (response.data == true) {
+                        $scope.isDrawerActive = true;
+                    } else {
+                        $scope.isDrawerActive = false;
+                    }
+                } else {
+                    $scope.isDrawerActive = false;
+                }
+         });
+  }
+
+
+
 });
 
 
