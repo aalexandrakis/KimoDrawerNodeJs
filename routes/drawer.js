@@ -246,15 +246,15 @@ exports.startDrawer = function(drawDate){
                        input.drawInfo.betsIncome = 0;
                        input.drawInfo.betsOutcome = 0;
                        query = "select returnRate from rates where gameType = " + bet.gameType + " and matches = " + bet.matches;
-                       connection.query(query, result, function(err, returnRate)     {
+                       connection.query(query, result, function(err, rates)     {
                              if(err){
                                  df.reject(errorFunction(err));
                              } else {
-                                 bet.returnRate = returnRate[0].returnRate;
                                  earnings = 0;
-                                 if(returnRate.length > 0){
+                                 if(rates.length > 0){
+                                   bet.returnRate = rates[0];
                                    earnings = bet.returnRate * bet.betCoins;
-                                   query = "update users set betCoins = betCoins + " + earnings;
+                                   query = "update users set userCoins = userCoins + " + earnings;
                                    connection.query(query, function(err, updResult){
                                         if(err)
                                             df.reject(errorFunction(err));
@@ -300,7 +300,7 @@ exports.startDrawer = function(drawDate){
                        headers: {
                            'Content-Type': 'application/json',
                            'Content-Length': Buffer.byteLength(JSON.stringify(data)),
-                           "Authorization": "key=AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII",
+                           "Authorization": "key=AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII"
                        }
                    };
                    newReq = http.request(options, function(newRes) {
