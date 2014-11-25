@@ -251,6 +251,13 @@ exports.startDrawer = function(drawDate){
                                  df.reject(errorFunction(err));
                              } else {
                                  if(returnRate.length > 0){
+                                   data = {
+                                           Type : "WIN_NOTIFICATION",
+                                           Draw : input.drawDateTime,
+                                           Matches : bet.matches,
+                                           Earnings : bet.returnRate * bet.multiplier * bet.betCoins
+                                   }
+                                   sendPushNotification(data);
                                    bet.returnRate = returnRate[0].returnRate;
                                    input.drawInfo.winningBets++;
                                    input.drawInfo.betsOutcome += bet.returnRate * bet.multiplier * bet.betCoins;
@@ -310,6 +317,36 @@ exports.startDrawer = function(drawDate){
         return df.promise;
     }
 
+    function sendPushNotification(data){
+           console.log("sending push notification");
+           http = require('http');
+           		options = {
+           		    host: "https://android.googleapis.com/gcm/send",
+           		    path: "https://android.googleapis.com/gcm/send",
+           		    method: 'POST',
+           		    headers: {
+           		        'Content-Type': 'application/json',
+           		        'Content-Length': Buffer.byteLength(JSON.stringify(data)),
+           		        "Authorization": "key=AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII",
+           		    }
+           		};
+           		newReq = http.request(options, function(newRes) {
+           			newRes.setEncoding('utf8');
+           			newRes.on('data', function (result) {
+           				console.log("sending push notification on data");
+           		    });
+           			newRes.on('end', function (result) {
+           				console.log("sending push notification on end");
+           		    });
+           		});
+           		newReq.on('error', function(error){
+//           			res.redirect('/error/408');
+                        console.log("error sending push notification");
+           		});
+           		newReq.write(JSON.stringify(data));
+           		newReq.end();
+
+    }
     function storeDrawInfo(input){
         df = new Q.defer();
         values = {
