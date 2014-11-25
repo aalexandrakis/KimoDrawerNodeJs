@@ -250,17 +250,30 @@ exports.startDrawer = function(drawDate){
                              if(err){
                                  df.reject(errorFunction(err));
                              } else {
+                                 bet.returnRate = returnRate[0].returnRate;
+                                 earnings = 0;
                                  if(returnRate.length > 0){
-                                   data = {
-                                           "data.Type" : "WIN_NOTIFICATION",
-                                           "data.Draw" : input.drawDateTime,
-                                           "data.Matches" : bet.matches,
-                                           "data.Earnings" : bet.returnRate * bet.multiplier * bet.betCoins
-                                   }
-                                   sendPushNotification(data);
-                                   bet.returnRate = returnRate[0].returnRate;
+                                   earnings = bet.returnRate * bet.betCoins;
+                                   query = "update users set betCoins = betCoins + " + earnings;
+                                   connection.query(query, function(err, updResult){
+                                        if(err)
+                                            df.reject(errorFunction(err));
+                                        query = "select regId from users where userId = " + bet.userId;
+                                        connection.query(query, function(err, regIdJson){
+                                           if(err)
+                                               df.reject(errorFunction(err));
+                                               data = {
+                                                       "registration_id": regIdJson.regId,
+                                                       "data.Type" : "WIN_NOTIFICATION",
+                                                       "data.Draw" : input.drawDateTime,
+                                                       "data.Matches" : bet.matches,
+                                                       "data.Earnings" : earnings
+                                               }
+                                               sendPushNotification(data);
+                                        });
+                                   });
                                    input.drawInfo.winningBets++;
-                                   input.drawInfo.betsOutcome += bet.returnRate * bet.multiplier * bet.betCoins;
+                                   input.drawInfo.betsOutcome += earnings;
                                    input.drawInfo.betsIncome += bet.betCoins;
                                  } else {
                                    bet.returnRate = 0;
