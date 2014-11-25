@@ -4,6 +4,8 @@ var functions = require('../public/functions.js');
 var router = express.Router();
 var Q = require('q');
 var mysql = require('mysql');
+var gcm = require('node-gcm');
+
 
 var connection = mysql.createConnection({
   host     : 'localhost',
@@ -183,28 +185,28 @@ exports.startDrawer = function(drawDate){
                return a - b;
             });
 
-            result = {};
-            result.drawDateTime = new Date();
-            result.drawNumber1 = numbers[0];
-            result.drawNumber2 = numbers[1];
-            result.drawNumber3 = numbers[2];
-            result.drawNumber4 = numbers[3];
-            result.drawNumber5 = numbers[4];
-            result.drawNumber6 = numbers[5];
-            result.drawNumber7 = numbers[6];
-            result.drawNumber8 = numbers[7];
-            result.drawNumber9 = numbers[8];
-            result.drawNumber10 = numbers[9];
-            result.drawNumber11 = numbers[10];
-            result.drawNumber12 = numbers[11];
-            result.drawNumber13 = numbers[12];
-            result.drawNumber14 = numbers[13];
-            result.drawNumber15 = numbers[14];
-            result.drawNumber16 = numbers[15];
-            result.drawNumber17 = numbers[16];
-            result.drawNumber18 = numbers[17];
-            result.drawNumber19 = numbers[18];
-            result.drawNumber20 = numbers[19];
+//            result = {};
+//            result.drawDateTime = new Date();
+//            result.drawNumber1 = numbers[0];
+//            result.drawNumber2 = numbers[1];
+//            result.drawNumber3 = numbers[2];
+//            result.drawNumber4 = numbers[3];
+//            result.drawNumber5 = numbers[4];
+//            result.drawNumber6 = numbers[5];
+//            result.drawNumber7 = numbers[6];
+//            result.drawNumber8 = numbers[7];
+//            result.drawNumber9 = numbers[8];
+//            result.drawNumber10 = numbers[9];
+//            result.drawNumber11 = numbers[10];
+//            result.drawNumber12 = numbers[11];
+//            result.drawNumber13 = numbers[12];
+//            result.drawNumber14 = numbers[13];
+//            result.drawNumber15 = numbers[14];
+//            result.drawNumber16 = numbers[15];
+//            result.drawNumber17 = numbers[16];
+//            result.drawNumber18 = numbers[17];
+//            result.drawNumber19 = numbers[18];
+//            result.drawNumber20 = numbers[19];
             query = "select * ," +
             "CONCAT(betNumber1 , \", \" , betNumber2 , \", \" , betNumber3 , \", \" , betNumber4 , \", \" , betNumber5 , \", \" , betNumber6 , \", \" , " +
             " betNumber7 , \", \" , betNumber8 , \", \" , betNumber9 , \", \" , betNumber10 , \", \" , betNumber11 , \", \" , betNumber12) as betNumbers" +
@@ -230,6 +232,9 @@ exports.startDrawer = function(drawDate){
           df = new Q.defer();
           drawNumbers = input.drawNumbers;
           if (input.bets.length == 0){
+            input.drawInfo.winningBets = 0;
+            input.drawInfo.betsIncome = 0;
+            input.drawInfo.betsOutcome = 0;
             df.resolve(input);
           }
           input.bets.forEach(function(bet, index){
@@ -252,24 +257,25 @@ exports.startDrawer = function(drawDate){
                              } else {
                                  earnings = 0;
                                  if(rates.length > 0){
-                                   bet.returnRate = rates[0];
-                                   earnings = bet.returnRate * bet.betCoins;
-                                   query = "update users set userCoins = userCoins + " + earnings;
-                                   connection.query(query, function(err, updResult){
+                                   bet.returnRate = rates[0].returnRate;
+                                   earnings = rates[0].returnRate * bet.betCoins;
+                                   query = "select * from users where userId = " + bet.userId;
+                                   connection.query(query, function(err, userRow){
                                         if(err)
                                             df.reject(errorFunction(err));
-                                        query = "select regId from users where userId = " + bet.userId;
-                                        connection.query(query, function(err, regIdJson){
+                                        earnings = rates[0].returnRate * bet.betCoins;
+                                        userRow[0].userCoins = userRow[0].userCoins + earnings;
+                                        query = "update users set ? where userId = " + bet.userId;
+                                        connection.query(query, userRow[0], function(err, updateResult){
                                            if(err)
                                                df.reject(errorFunction(err));
                                                data = {
-                                                       "registration_id": regIdJson.regId,
-                                                       "data.Type" : "WIN_NOTIFICATION",
-                                                       "data.Draw" : input.drawDateTime,
-                                                       "data.Matches" : bet.matches,
-                                                       "data.Earnings" : earnings
+                                                       "Type" : "WIN_NOTIFICATION",
+                                                       "Draw" : input.drawDateTime,
+                                                       "Matches" : bet.matches,
+                                                       "Earnings" : earnings
                                                }
-                                               sendPushNotification(data);
+                                               sendPushNotification(data, userRow[0].regId);
                                         });
                                    });
                                    input.drawInfo.winningBets++;
@@ -291,34 +297,23 @@ exports.startDrawer = function(drawDate){
           return df.promise;
     }
 
-    function sendPushNotification(data){
+    function sendPushNotification(data, regId){
            console.log("sending push notification");
-           http = require('http');
-                   options = {
-                       path: "https://android.googleapis.com/gcm/send",
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json',
-                           'Content-Length': Buffer.byteLength(JSON.stringify(data)),
-                           "Authorization": "key=AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII"
-                       }
-                   };
-                   newReq = http.request(options, function(newRes) {
-                       newRes.setEncoding('utf8');
-                       newRes.on('data', function (result) {
-                           console.log("sending push notification on data");
-                       });
-                       newRes.on('end', function (result) {
-                           console.log("sending push notification on end");
-                       });
-                   });
-                   newReq.on('error', function(error){
-//                       res.redirect('/error/408');
-                        console.log("error sending push notification ", error);
-                   });
-                   newReq.write(JSON.stringify(data));
-                   newReq.end();
+           // or with object values
+           var message = new gcm.Message({
+               collapseKey: 'Kimo',
+               delayWhileIdle: true,
+               timeToLive: 3,
+               data: data
+           });
 
+           var sender = new gcm.Sender('AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII');
+           regIds = [];
+           regIds.push(regId);
+           sender.send(message, regIds, 4, function (err, result) {
+               if(err)
+                   console.log(err);
+           });
     }
 
     function updateBets(input){
@@ -327,6 +322,7 @@ exports.startDrawer = function(drawDate){
         bets = input.bets;
         bets.forEach(function(bet, index){
             delete bet.id;
+//            console.log(input)
             bet.drawTimeStamp = input.drawDateTime;
             query="insert into bets_archive set ?";
             connection.query(query, bet, function(err, insertResult)     {
@@ -355,7 +351,7 @@ exports.startDrawer = function(drawDate){
 
         });
         if (bets.length == 0){
-            df.resolve(" no bets to process");
+            df.resolve(input);
         }
         return df.promise;
     }
