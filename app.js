@@ -35,15 +35,15 @@ app.use(cookieParser());
 app.use(cookieSession({secret: '9834306712alexik'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-//app.use(
-//    connection(mysql,{
-//        host: 'localhost',
-//        user: 'kimo',
-//        password : 'kimo',
-//        port : 3306, //port mysql
-//        database:'kimo'
-//    },'request')
-//);
+app.use(
+    connection(mysql,{
+        host: 'localhost',
+        user: 'kimo',
+        password : 'kimo',
+        port : 3306, //port mysql
+        database:'kimo'
+    },'request')
+);
 
 app.use(function (req, res, next) {
     //only for test req.url.indexOf('/startDrawer') != 0
