@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "main": "node ./bin/www.js"
+    "start": "node ./bin/www.js"
   },
   "dependencies": {
     "angular": "^1.3.3",
