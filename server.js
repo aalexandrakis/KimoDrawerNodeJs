@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var debug = require('debug')('kimodrawer');
-var app = require('../app');
+var app = require('./app');
 
 app.set('port', process.env.OPENSHIFT_NODEJS_PORT || 3005);
 
