@@ -2,31 +2,29 @@ kimoApp.controller("SignInController", function signInController($scope, $cookie
      $scope.title = "Kimo -  Sign In";
      $scope.formHeader = "Sign In";
 
-     $scope.adminEmailGroup = ["form-group"];
-     $scope.adminEmail = "";
-     $scope.adminEmailError = "";
+     $scope.userNameGroup = ["form-group"];
+     $scope.userName = "";
+     $scope.userNameError = "";
 
-     $scope.adminPassGroup = ["form-group"];
-     $scope.adminPass = "";
-     $scope.adminPassError = "";
+     $scope.userPassGroup = ["form-group"];
+     $scope.userPass = "";
+     $scope.userPassError = "";
 
      $scope.errorMessageGroup = {"display":"none"};
 
      $scope.login = function(){
-
           $scope.errorMessageGroup = {"display":"none"};
           if(!check()){
-
                $http({
-                 url: '/signIn',
+                 url: $scope.host + '/signIn',
                  method: "POST",
-                 data: {'adminEmail' : $scope.adminEmail , "adminPass": CryptoJS.SHA1($scope.adminPass).toString()}
+                 data: {'username' : $scope.userName , "password": CryptoJS.SHA1($scope.password).toString()}
                })
                .then(function(response) {
                         if (response.data.message){
                             $scope.errorMessageGroup = {"display":"block"};
                             $scope.errorMessage = response.data.message;
-                        } else if (!response.data.adminEmail){
+                        } else if (!response.data.userName){
                             $scope.errorMessageGroup = {"display":"block"};
                             $scope.errorMessage = response.data;
                         } else {
@@ -47,22 +45,22 @@ kimoApp.controller("SignInController", function signInController($scope, $cookie
 
      check = function(){
         isError = false;
-        if ($scope.adminEmail == ""){
-           $scope.adminEmailError = "You must type your email";
-           $scope.adminEmailGroup = ["form-group", "has-error"];
+        if ($scope.userName == ""){
+           $scope.userNameError = "You must type your username";
+           $scope.userNameGroup = ["form-group", "has-error"];
            isError = true;
         } else {
-           $scope.adminEmailError = "";
-           $scope.adminEmailGroup = ["form-group"];
+           $scope.userNameError = "";
+           $scope.userNameGroup = ["form-group"];
         }
 
-        if ($scope.adminPass == ""){
-           $scope.adminPassError = "You must type your password";
-           $scope.adminPassGroup = ["form-group", "has-error"];
+        if ($scope.password == ""){
+           $scope.userPassError = "You must type your password";
+           $scope.userPassGroup = ["form-group", "has-error"];
            isError = true;
         } else {
-           $scope.adminPassError = "";
-           $scope.adminPassGroup = ["form-group"];
+           $scope.userPassError = "";
+           $scope.userPassGroup = ["form-group"];
         }
 
         return isError;

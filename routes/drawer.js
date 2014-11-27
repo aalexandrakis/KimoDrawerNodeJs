@@ -154,6 +154,7 @@ exports.startDrawer = function(drawDate){
             result.drawNumber18 = numbers[17];
             result.drawNumber19 = numbers[18];
             result.drawNumber20 = numbers[19];
+
             query = "INSERT into draw set ?";
             connection.query(query, result, function(err, newDrawResult)     {
                   if(err){

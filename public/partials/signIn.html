@@ -7,24 +7,24 @@
                 <div class=panel-body>
                   <form class="form-horizontal">
                     <fieldset>
-                      <div ng-class="adminEmailGroup">
+                      <div ng-class="userNameGroup">
                         <label class="col-md-2 control-label"> User Name </label>
                         <div class="col-md-10">
-                          <input class="form-control" placeholder="Admin Email" type="text" ng-model="adminEmail">
-                          <label class="control-label">{{adminEmailError}}</label>
+                          <input class="form-control" placeholder="User Name" type="text" ng-model="userName">
+                          <label class="control-label">{{userNameError}}</label>
                         </div>
                       </div>
 
-                      <div ng-class="adminPassGroup">
-                        <label class="col-md-2 control-label"> User Name </label>
+                      <div ng-class="userPassGroup">
+                        <label class="col-md-2 control-label"> Password </label>
                         <div class="col-md-10">
-                          <input class="form-control"  placeholder="Admin Password" type="password" ng-model="adminPass">
-                          <label class="control-label">{{adminPassError}}</label>
+                          <input class="form-control"  placeholder="Password" type="password" ng-model="password">
+                          <label class="control-label">{{userPassError}}</label>
                         </div>
                       </div>
 
                       <div>
-                        <input type="button" class="btn btn-lg btn-block btn-success"  value="Sign In" ng-click="login(adminEmail, adminPass)"/>
+                        <input type="button" class="btn btn-lg btn-block btn-success"  value="Sign In" ng-click="login(userName, userPass)"/>
                       </div>
                     </fieldset>
                   </form>
