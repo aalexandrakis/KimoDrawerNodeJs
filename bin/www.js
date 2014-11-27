@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var debug = require('debug')('kimodrawer');
-var app = require('./app');
+var app = require('../app');
 
 var server_port = process.env.OPENSHIFT_NODEJS_PORT || 3005
 var server_ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1'
