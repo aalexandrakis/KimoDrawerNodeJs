@@ -15,10 +15,12 @@ kimoApp.controller("SignInController", function signInController($scope, $cookie
      $scope.login = function(){
           $scope.errorMessageGroup = {"display":"none"};
           if(!check()){
+               userNamePassword = CryptoJS.enc.Utf8.parse($scope.username + ":" + CryptoJS.SHA1($scope.password).toString());
+               encrypted = CryptoJS.enc.Base64.stringify(userNamePassword);
                $http({
-                 url: $scope.host + '/signIn',
+                 url: 'http://localhost:3000/signIn',
                  method: "POST",
-                 data: {'username' : $scope.userName , "password": CryptoJS.SHA1($scope.password).toString()}
+                 headers: {"Authorization":"Basic " + encrypted }
                })
                .then(function(response) {
                         if (response.data.message){
