@@ -1,4 +1,4 @@
-kimoApp.controller("SignInController", function signInController($scope, $cookieStore, $window, $http){
+kimoApp.controller("SignInController", function signInController($scope, $cookieStore, $window, $http, Commons){
      $scope.title = "Kimo -  Sign In";
      $scope.formHeader = "Sign In";
 
@@ -17,12 +17,14 @@ kimoApp.controller("SignInController", function signInController($scope, $cookie
           $scope.errorMessageGroup = {"display":"none"};
           userNamePassword = CryptoJS.enc.Utf8.parse($scope.userName + ":" + CryptoJS.SHA1($scope.password).toString());
           encrypted = CryptoJS.enc.Base64.stringify(userNamePassword);
-          console.log(encrypted);
           if(!check()){
-                $http.defaults.headers.common.Authorization = 'Basic '+ encrypted;
                $http({
                  method: 'POST',
-                 url: 'http://localhost:3000/signIn'
+                 url: Commons.apiEndPoint + '/signIn',
+                 headers: {
+                    'content-type': 'text/plain',
+                    'authorization': 'Basic ' + encrypted
+                 }
                })
                .then(function(response) {
                         if (response.data.message){
