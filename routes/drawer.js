@@ -168,9 +168,10 @@ exports.startDrawer = function(drawDate){
            response += data;
        },
        function(end){
-         jsonRes = JSON.parse(response);
-         input.bets = jsonRes.bets;
-         input.drawInfo.bets = input.bets.length;
+         json = JSON.parse(response);
+         input.bets = [];
+         input.bets = json.bets;
+         input.drawInfo.bets = json.bets.length;
          df.resolve(input);
        },
        function(error){

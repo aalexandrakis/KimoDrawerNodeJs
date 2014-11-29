@@ -31,10 +31,11 @@ fromEuroToIsoWithDelimiters: function(dateString){
 },
 
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
-    path = 'http://' + process.env.KIMO_HOST +  (process.env.KIMO_PORT ? ':' + process.env.KIMO_PORT : '') + '/' + url;
     http = require('http');
     options = {
-        path: path,
+        host: process.env.KIMO_HOST,
+        port: process.env.KIMO_PORT,
+        path: url,
         method: method,
         headers: {
             'Content-Type': 'application/json',
@@ -59,10 +60,12 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
 },
 
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
-    path = 'http://' + process.env.KIMO_HOST +  (process.env.KIMO_PORT ? ':' + process.env.KIMO_PORT : '') + '/' + url;
+    path = "http://" + process.env.KIMO_HOST + (process.env.KIMO_PORT ? ":" + process.env.KIMO_PORT : "") + url;
     http = require('http');
     options = {
-        path: path + "/" + data,
+        host: process.env.KIMO_HOST,
+        port: process.env.KIMO_PORT,
+        path: url + "/" + data,
         method: "GET",
         headers: {
             'Authorization': 'Basic ' + authorization,
