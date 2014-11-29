@@ -60,7 +60,6 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
 },
 
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
-    path = "http://" + process.env.KIMO_HOST + (process.env.KIMO_PORT ? ":" + process.env.KIMO_PORT : "") + url;
     http = require('http');
 //    http.get('http://kimo-aalexandrakis.rhcloud.com' + url + "/" + data, function(res){
 //        dataCallBack(res);
