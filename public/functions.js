@@ -31,11 +31,6 @@ fromEuroToIsoWithDelimiters: function(dateString){
 },
 
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
-    console.log(process.env.KIMO_HOST_NAME);
-    console.log(process.env.KIMO_PORT || 'undefined variable');
-    console.log(url);
-    console.log(data);
-
     http = require('http');
     options = {
         hostname: process.env.KIMO_HOST_NAME,
