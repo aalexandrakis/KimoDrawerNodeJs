@@ -8,7 +8,7 @@ var mysql = require('mysql');
 var connection = mysql.createConnection({
   host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
   user     : process.env.MYSQL_USERNAME,
-  password : process.env.MYSQL_PASWORD,
+  password : process.env.MYSQL_PASSWORD,
   port : process.env.OPENSHIFT_MYSQL_DB_PORT, //port mysql
   database:'kimo'
 });
@@ -163,13 +163,12 @@ exports.startDrawer = function(drawDate){
        response = "";
        functions.httpGet(authorization, '/drawer/retrieveActiveBets', functions.convertDateToIsoString(input.drawDateTime),
        function(data){
-           console.log("data " + data);
            response += data;
        },
        function(end){
-         console.log("data " + response);
-         input.bets = response.bets;
-         input.drawInfo.bets = response.bets.length;
+         jsonRes = JSON.parse(response);
+         input.bets = jsonRes.bets;
+         input.drawInfo.bets = input.bets.length;
          df.resolve(input);
        },
        function(error){
@@ -234,15 +233,12 @@ exports.startDrawer = function(drawDate){
     function updateBets(input){
         console.log("========= updating bets");
         df = new Q.defer()
-        if (bets.length != 0){
-            bets = {bets: input.bets};
-            functions.httpPost("PUT", authorization, '/drawer/updateBets', JSON.stringify(bets),
+        if (input.bets.length != 0){
+            functions.httpPost("PUT", authorization, '/drawer/updateBets', JSON.stringify({bets: input.bets}),
             function(data){
                 response += data;
             },
             function(end){
-              input.bets = response.bets;
-              input.drawInfo.bets = response.bets.length;
               df.resolve(input);
             },
             function(error){
@@ -255,6 +251,7 @@ exports.startDrawer = function(drawDate){
     }
 
     function storeDrawInfo(input){
+        console.log("========= store draw info");
         df = new Q.defer();
         values = {
             drawDateTime: input.drawInfo.drawDateDime,

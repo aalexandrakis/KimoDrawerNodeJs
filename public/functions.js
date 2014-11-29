@@ -31,7 +31,6 @@ fromEuroToIsoWithDelimiters: function(dateString){
 },
 
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
-    console.log('Http " + method + " Function ' + url + ' ' + data);
     http = require('http');
     options = {
         host: process.env.OPENSHIFT_KIMO_IP,
@@ -61,8 +60,6 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
 },
 
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
-    console.log('Http Get Function ' + url + '/' + data);
-
     http = require('http');
     options = {
         host: process.env.OPENSHIFT_KIMO_IP,
@@ -70,8 +67,13 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
         path: url + "/" + data,
         method: "GET",
         headers: {
-            'Authorization': 'Basic ' + authorization,
-            'Content-Type': 'application/json'
+            'Authorization': authorization,
+            'Connection': 'keep-alive',
+            'accept':'text/html;application/json',
+            'accept-encoding':'gzip, deflate, sdch',
+            'accept-language': 'en-US,en;q=0.8',
+            'content-type': 'text/plain',
+            'content-length':0
         }
     };
     newReq = http.request(options, function(newRes) {
@@ -88,7 +90,7 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
     newReq.on('error', function(error){
         errorCallBack(error);
     });
-    newReq.write(data);
+//    newReq.write(data);
     newReq.end();
 }
 
