@@ -5,7 +5,6 @@ var router = express.Router();
 
 
 router.get(/\/makeOneDraw/, function(req, res) {
-	console.log(req.headers['authorization']);
 	response = global.drawer.makeOneDraw(req.headers['authorization']);
 	res.status(200).send("Draw completed successfully");
 //	res.status(response.status).send(response.message);
