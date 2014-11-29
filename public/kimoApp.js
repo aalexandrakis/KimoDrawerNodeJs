@@ -6,15 +6,16 @@ kimoApp.directive('headerDirective', function() {
                     controller: 'HeadersController'
                   };
        });
-kimoApp.factory('Commons', function($cookieStore){
-    authorization = ""
-    if (!angular.isUndefined($cookieStore.get("user"))){
-        authorization =  CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse($cookieStore.get("user").userName + ":" + CryptoJS.SHA1($cookieStore.get("user").userPassword).toString()))
-    }
-    return {
-        authorization: authorization
-    }
-});
+//kimoApp.factory('Commons', function($cookieStore){
+//    authorization = ""
+//    if (!angular.isUndefined($cookieStore.get("user"))){
+//        authorization =  CryptoJS.enc.Base64.stringify($cookieStore.get("user").userName + ":" + $cookieStore.get("user").userPassword);
+//        console.log(authorization);
+//    }
+//    return {
+//        authorization: authorization
+//    }
+//});
 
 kimoApp.run(function($rootScope, $location, $cookieStore){
     $rootScope.$on('$routeChangeStart', function(event, route){

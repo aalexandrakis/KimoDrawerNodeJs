@@ -10,10 +10,13 @@ var connection = mysql.createConnection({
   user     : process.env.MYSQL_USERNAME,
   password : process.env.MYSQL_PASSWORD,
   port : process.env.OPENSHIFT_MYSQL_DB_PORT, //port mysql
-  database:'kimo'
+  database:'kimodrawer'
 });
 
-var authorization;
+var crypto = require('crypto')
+  , password = crypto.createHash('sha1');
+    password.update(process.env.KIMO_DRAWER_PASSWORD);
+var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password.digest('hex')).toString('base64');
 
 // create a Mersenne Twister-19937 that is auto-seeded based on time and other random values
 var engine = Random.engines.mt19937().autoSeed();
@@ -22,8 +25,7 @@ var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
 
-exports.makeOneDraw = function(auth){
-         authorization = auth;
+exports.makeOneDraw = function(){
 
          Q().then(function(result){
                 return newDraw(functions.convertDateToMySqlTimeStampString(new Date()));

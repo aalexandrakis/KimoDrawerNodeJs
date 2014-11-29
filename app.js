@@ -35,9 +35,19 @@ app.use(cookieParser());
 app.use(cookieSession({secret: '9834306712alexik'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(
+    connection(mysql,{
+        host: process.env.OPENSHIFT_MYSQL_DB_HOST || 'localhost',
+        user: process.env.MYSQL_USERNAME,
+        password : process.env.MYSQL_PASSWORD,
+        port : process.env.OPENSHIFT_MYSQL_DB_PORT || 3306, //port mysql
+        database:'kimodrawer'
+    },'request')
+);
+
 app.use(function (req, res, next) {
     //only for test req.url.indexOf('/startDrawer') != 0
-    if (req.url != '/tests' && req.url != '/' && req.url != '/signOut' && req.url != '/signIn' && !req.headers['authorization']) {
+    if (req.url != '/tests' && req.url != '/' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
         res.status(400).send("You do not have the authority to visit this page.");
   	} else {
          next();

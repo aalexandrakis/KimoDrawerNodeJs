@@ -1,4 +1,4 @@
-kimoApp.controller("DrawerController", function drawerController($scope, $cookieStore, $window, $http, $interval, Commons){
+kimoApp.controller("DrawerController", function drawerController($scope, $cookieStore, $window, $http, $interval){
   $scope.title = "Kimo -  Drawer";
   $scope.formHeader = "Drawer";
   $scope.alerts = [];
@@ -27,8 +27,7 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
   $scope.makeOneDraw = function(){
       $http({
              url: '/drawerService/makeOneDraw',
-             method: "GET",
-             headers: {'authorization' : 'Basic ' + Commons.authorization}
+             method: "GET"
          })
        .then(function (response){
               console.log(response);

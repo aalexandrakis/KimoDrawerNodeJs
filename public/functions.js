@@ -67,7 +67,7 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
         path: url + "/" + data,
         method: "GET",
         headers: {
-            'Authorization': authorization,
+            'Authorization': 'Basic ' + authorization,
             'Connection': 'keep-alive',
             'accept':'text/html;application/json',
             'accept-encoding':'gzip, deflate, sdch',
@@ -81,8 +81,8 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
         newRes.on('data', function (result) {
             dataCallBack(result);
         });
-        newRes.on('end', function (result) {
-            endCallBack(result);
+        newRes.on('end', function (end) {
+            endCallBack(end);
 
         });
 
