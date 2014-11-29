@@ -48,6 +48,7 @@ app.use(
 
 console.log(OPENSHIFT_KIMODRAWER_IP);
 console.log(OPENSHIFT_KIMODRAWER_PORT);
+console.log(OPENSHIFT_APP_DNS);
 app.use(function (req, res, next) {
     //only for test req.url.indexOf('/startDrawer') != 0
     if (req.url != '/tests' && req.url != '/' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
