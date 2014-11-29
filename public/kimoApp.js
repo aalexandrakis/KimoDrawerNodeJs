@@ -12,7 +12,6 @@ kimoApp.factory('Commons', function($cookieStore){
         authorization =  CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse($cookieStore.get("user").userName + ":" + CryptoJS.SHA1($cookieStore.get("user").userPassword).toString()))
     }
     return {
-        apiEndPoint: "http://localhost:3000",
         authorization: authorization
     }
 });
