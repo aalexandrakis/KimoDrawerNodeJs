@@ -24,7 +24,6 @@ router.get('/:betsToCreate', function(req, res) {
 		bets.push(createBet(createRandomList()));
 		if (i+1 == req.params['betsToCreate']){
 			status = saveBet(bets);
-			console.log("status " + status);
 			res.status(status).send(status==200?"Bets created successfully":"An error occurred");
 		}
 	}

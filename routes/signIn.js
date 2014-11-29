@@ -10,7 +10,6 @@ router.post('/', function(req, res) {
 			} else if(userRow.length == 0){
 				res.status(200).send({message: "Email or password error. Please try again", status: "900"});
 			} else {
-				console.log(userRow);
 				req.session.user = userRow[0];
 				res.send(userRow[0]);
 			}

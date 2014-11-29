@@ -30,7 +30,6 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
              method: "GET"
          })
        .then(function (response){
-              console.log(response);
               if (response.status == 200){
                   $scope.alerts.push(response.data);
               }
@@ -43,7 +42,6 @@ $scope.createTestBets = function(){
              method: "GET"
          })
        .then(function (response){
-              console.log(response);
               $scope.alerts.push(response.data);
        });
   }
@@ -80,7 +78,6 @@ $scope.createTestBets = function(){
                method: "GET"
            })
          .then(function (response){
-                console.log(response);
                 if (response.status == 200){
                     if (response.data == true) {
                         $scope.isDrawerActive = true;
