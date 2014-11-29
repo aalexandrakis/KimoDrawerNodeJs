@@ -33,8 +33,8 @@ fromEuroToIsoWithDelimiters: function(dateString){
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
     http = require('http');
     options = {
-        host: process.env.KIMO_HOST,
-        port: process.env.KIMO_PORT,
+        hostname: process.env.KIMO_HOST_NAME,
+        port: process.env.KIMO_PORT || '',
         path: url,
         method: method,
         headers: {
@@ -62,9 +62,14 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
     path = "http://" + process.env.KIMO_HOST + (process.env.KIMO_PORT ? ":" + process.env.KIMO_PORT : "") + url;
     http = require('http');
+//    http.get('http://kimo-aalexandrakis.rhcloud.com' + url + "/" + data, function(res){
+//        dataCallBack(res);
+//        endCallBack(res);
+//    }).on('error', errorCallBack(error));
+
     options = {
-        host: process.env.KIMO_HOST,
-        port: process.env.KIMO_PORT,
+        hostname: process.env.KIMO_HOST_NAME,
+        port: process.env.KIMO_PORT || '',
         path: url + "/" + data,
         method: "GET",
         headers: {
