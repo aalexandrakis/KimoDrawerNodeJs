@@ -33,8 +33,8 @@ fromEuroToIsoWithDelimiters: function(dateString){
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
     http = require('http');
     options = {
-        host: process.env.OPENSHIFT_KIMO_IP,
-        port: process.env.OPENSHIFT_KIMO_PORT,
+        host: process.env.KIMO_HOST,
+        port: process.env.KIMO_PORT,
         path: url,
         method: method,
         headers: {
@@ -62,8 +62,8 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
     http = require('http');
     options = {
-        host: process.env.OPENSHIFT_KIMO_IP,
-        port: process.env.OPENSHIFT_KIMO_PORT,
+        host: process.env.KIMO_HOST,
+        port: process.env.KIMO_PORT,
         path: url + "/" + data,
         method: "GET",
         headers: {
