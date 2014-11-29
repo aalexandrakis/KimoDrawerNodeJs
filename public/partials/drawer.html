@@ -28,6 +28,19 @@
                           <input ng-hide="!isDrawerActive" type="button" class="btn btn-danger" value="Stop" ng-click="stopDrawer()"/>
                       </div>
                   </div>
+                  <div class="row">
+                      <div class="col-md-5">
+                          <div class="form-group">
+                              <div class="input-group">
+                                  <!--<label>Date To</label>-->
+                                  <input name="betsToCreate" placeholder="Bets to create" class="form-control" type="number" ng-model="betsToCreate">
+                              </div>
+                          </div>
+                      </div>
+                      <div class="col-md-5">
+                        <input type="button" class="btn btn-primary" value="Create Test Bets" ng-click="createTestBets()"/>
+                      </div>
+                  </div>
                     <!--<div class="row">-->
                   <!--</div>-->
                 </div>

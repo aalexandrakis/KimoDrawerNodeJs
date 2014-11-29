@@ -12,12 +12,21 @@ var multiplier = Random.integer(1, 20);
 var repeatedDraws = Random.integer(1, 12);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
+var crypto = require('crypto')
+  , password = crypto.createHash('sha1');
+    password.update(process.env.KIMO_DRAWER_PASSWORD);
+var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password.digest('hex')).toString('base64');
 
 /* GET login. */
 router.get('/:betsToCreate', function(req, res) {
-
+	bets = [];
 	for (i=0;i<req.params['betsToCreate'];i++){
-		res.status(200).send(saveBet(createBet(createRandomList())));
+		bets.push(createBet(createRandomList()));
+		if (i+1 == req.params['betsToCreate']){
+			status = saveBet(bets);
+			console.log("status " + status);
+			res.status(status).send(status==200?"Bets created successfully":"An error occurred");
+		}
 	}
 
 	//create random number list
@@ -60,23 +69,21 @@ router.get('/:betsToCreate', function(req, res) {
 		 return result;
 	}
 
-	function saveBet(bet){
-		   req.getConnection(function(err,connection){
-			   if(err){
-					console.log(err);
-			   } else {
-			   	 query = "INSERT into active_bets set ?";
-				 connection.query(query, bet, function(err, newDrawResult)     {
-					  if(err){
-						  console.log(err);
-					  } else {
-						  return bet;
-					  }
-					});
-				 }
-		   });
+	function saveBet(bets){
+		var response="";
+		functions.httpPost("PUT", authorization, '/drawer/saveBets', JSON.stringify({bets: bets}),
+		function(data){
+			response += data;
+		},
+		function(end){
+			return 200;
+		},
+		function(error){
+			console.log(error);
+			return 500;
+		});
+		return 200;
 	}
-
 });
 
 

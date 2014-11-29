@@ -37,6 +37,17 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
        });
   }
 
+$scope.createTestBets = function(){
+      $http({
+             url: '/testBets/' + $scope.betsToCreate,
+             method: "GET"
+         })
+       .then(function (response){
+              console.log(response);
+              $scope.alerts.push(response.data);
+       });
+  }
+
   $scope.startDrawer = function(){
       $http({
              url: '/drawerService/startDrawer/' + $scope.startDate.replace(/-/g, "").replace(/:/g, "").replace(/ /g, "") + "00",
