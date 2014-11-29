@@ -6,11 +6,13 @@ kimoApp.directive('headerDirective', function() {
                     controller: 'HeadersController'
                   };
        });
-kimoApp.factory('Commons', function(){
+kimoApp.factory('Commons', function($cookieStore){
     return {
-        apiEndPoint: "http://localhost:3000"
+        apiEndPoint: "http://localhost:3000",
+        authorization:  CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse($cookieStore.get("user").userName + ":" + CryptoJS.SHA1($cookieStore.get("user").userPassword).toString()))
     }
 });
+
 kimoApp.run(function($rootScope, $location, $cookieStore){
     $rootScope.$on('$routeChangeStart', function(event, route){
         if (route.mustBeLoggedOn && angular.isUndefined($cookieStore.get("user"))) {

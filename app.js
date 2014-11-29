@@ -35,20 +35,10 @@ app.use(cookieParser());
 app.use(cookieSession({secret: '9834306712alexik'}));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(
-    connection(mysql,{
-        host: '127.3.55.130',
-        user: 'kimo',
-        password : 'kimo',
-        port : 3306, //port mysql
-        database:'kimo'
-    },'request')
-);
-
 app.use(function (req, res, next) {
     //only for test req.url.indexOf('/startDrawer') != 0
-    if (req.url != '/tests' && req.url != '/' && req.url != '/signOut' && req.url != '/signIn' && !req.session.user) {
-        res.status(500).send("You do not have the authority to visit this page.");
+    if (req.url != '/tests' && req.url != '/' && req.url != '/signOut' && req.url != '/signIn' && !req.headers['authorization']) {
+        res.status(400).send("You do not have the authority to visit this page.");
   	} else {
          next();
   	}

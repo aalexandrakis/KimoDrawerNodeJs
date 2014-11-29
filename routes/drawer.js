@@ -4,17 +4,16 @@ var functions = require('../public/functions.js');
 var router = express.Router();
 var Q = require('q');
 var mysql = require('mysql');
-var gcm = require('node-gcm');
-
 
 var connection = mysql.createConnection({
-  host     : '127.3.55.130',
-  user     : 'kimo',
-  password : 'kimo',
-  port : 3306, //port mysql
+  host     : process.env.OPENSHIFT_MYSQL_DB_HOST,
+  user     : process.env.MYSQL_USERNAME,
+  password : process.env.MYSQL_PASWORD,
+  port : process.env.OPENSHIFT_MYSQL_DB_PORT, //port mysql
   database:'kimo'
 });
 
+var authorization;
 
 // create a Mersenne Twister-19937 that is auto-seeded based on time and other random values
 var engine = Random.engines.mt19937().autoSeed();
@@ -23,7 +22,8 @@ var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
 
-exports.makeOneDraw = function(){
+exports.makeOneDraw = function(auth){
+         authorization = auth;
 
          Q().then(function(result){
                 return newDraw(functions.convertDateToMySqlTimeStampString(new Date()));
@@ -73,38 +73,26 @@ exports.startDrawer = function(drawDate){
         error.message = "=======================" + err;
         return error;
     }
-    //get next draw
-    function getNextDraw(){
-        console.log("========= getting next draw");
-        query = "SELECT nextDraw FROM next_draw ";
-        connection.query(query ,function(err,nextDraw)     {
-            if(err){
-                return(err);
-            } else {
-                return(nextDraw);
-            }
-        });
-    }
-
 
     //save next draw + 5 minutes
-    function saveNextDraw(currentDraw){
+    function saveNextDrawDate(currentDraw){
         df = new Q.defer();
         currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
         globalNextDraw = functions.convertDateToIsoString(nextDraw);
         console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
         nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
-
-        query = "UPDATE next_draw set nextDraw = '" + nextDrawString + "'";
-        connection.query(query, function(err,nextDrawRow)     {
-            if(err){
-                df.reject(errorFunction(err));
-            } else {
-                console.log("========= next draw at " + nextDrawString);
-                df.resolve({'currentDraw':currentDraw, 'nextDraw':nextDraw});
-            }
-
+        var response="";
+        data = {'nextDrawString': nextDrawString};
+        functions.httpPost("PUT", authorization, '/drawer/saveNextDrawDate', JSON.stringify(data),
+        function(data){
+            response += data;
+        },
+        function(end){
+            df.resolve({'currentDraw':currentDraw, 'nextDraw':nextDraw});
+        },
+        function(error){
+            df.reject(error);
         });
         return df.promise;
     }
@@ -125,14 +113,6 @@ exports.startDrawer = function(drawDate){
             });
 
             result = {};
-//            result.drawInfo = {};
-//            result.drawInfo = {
-//                   drawDateTime: "",
-//                   bets: 0,
-//                   winningBets: 0,
-//                   betsIncome: 0,
-//                   betsOutcome: 0
-//            };
             result.drawDateTime = new Date();
             result.drawNumber1 = numbers[0];
             result.drawNumber2 = numbers[1];
@@ -155,17 +135,21 @@ exports.startDrawer = function(drawDate){
             result.drawNumber19 = numbers[18];
             result.drawNumber20 = numbers[19];
 
-            query = "INSERT into draw set ?";
-            connection.query(query, result, function(err, newDrawResult)     {
-                  if(err){
-                      df.reject(errorFunction(err));
-                  } else {
-                      result.drawNumbers = numbers;
-                      result.drawInfo = {};
-                      result.drawInfo.drawDateTime = result.drawDateTime;
-                      df.resolve(result);
-                  }
+            var response="";
+            functions.httpPost("POST", authorization, '/drawer/saveDraw', JSON.stringify(result),
+            function(data){
+                response += data;
+            },
+            function(end){
+              result.drawNumbers = numbers;
+              result.drawInfo = {};
+              result.drawInfo.drawDateTime = result.drawDateTime;
+              df.resolve(result);
+            },
+            function(error){
+                df.reject(error);
             });
+
           }
        }
        return df.promise;
@@ -176,53 +160,21 @@ exports.startDrawer = function(drawDate){
        console.log("========= retrieving active bets ");
        numbers = [];
        df = new Q.defer();
-       while (numbers.length != 20){
-          number = distribution(engine);
-          if (numbers.indexOf(number) == -1){
-            numbers.push(number);
-          }
-          if (numbers.length == 20){
-            numbers = numbers.sort(function(a,b){
-               return a - b;
-            });
-
-//            result = {};
-//            result.drawDateTime = new Date();
-//            result.drawNumber1 = numbers[0];
-//            result.drawNumber2 = numbers[1];
-//            result.drawNumber3 = numbers[2];
-//            result.drawNumber4 = numbers[3];
-//            result.drawNumber5 = numbers[4];
-//            result.drawNumber6 = numbers[5];
-//            result.drawNumber7 = numbers[6];
-//            result.drawNumber8 = numbers[7];
-//            result.drawNumber9 = numbers[8];
-//            result.drawNumber10 = numbers[9];
-//            result.drawNumber11 = numbers[10];
-//            result.drawNumber12 = numbers[11];
-//            result.drawNumber13 = numbers[12];
-//            result.drawNumber14 = numbers[13];
-//            result.drawNumber15 = numbers[14];
-//            result.drawNumber16 = numbers[15];
-//            result.drawNumber17 = numbers[16];
-//            result.drawNumber18 = numbers[17];
-//            result.drawNumber19 = numbers[18];
-//            result.drawNumber20 = numbers[19];
-            query = "select * ," +
-            "CONCAT(betNumber1 , \", \" , betNumber2 , \", \" , betNumber3 , \", \" , betNumber4 , \", \" , betNumber5 , \", \" , betNumber6 , \", \" , " +
-            " betNumber7 , \", \" , betNumber8 , \", \" , betNumber9 , \", \" , betNumber10 , \", \" , betNumber11 , \", \" , betNumber12) as betNumbers" +
-            " from active_bets where betDateTime < '" + functions.convertDateToMySqlTimeStampString(input.drawDateTime) + "'";
-            connection.query(query, function(err, bets)     {
-                  if(err){
-                      df.reject(errorFunction(err));
-                  } else {
-                      input.bets = bets;
-                      input.drawInfo.bets = bets.length;
-                      df.resolve(input);
-                  }
-            });
-          }
-       }
+       response = "";
+       functions.httpGet(authorization, '/drawer/retrieveActiveBets', functions.convertDateToIsoString(input.drawDateTime),
+       function(data){
+           console.log("data " + data);
+           response += data;
+       },
+       function(end){
+         console.log("data " + response);
+         input.bets = response.bets;
+         input.drawInfo.bets = response.bets.length;
+         df.resolve(input);
+       },
+       function(error){
+           df.reject(error);
+       });
        return df.promise;
    }
 
@@ -260,25 +212,6 @@ exports.startDrawer = function(drawDate){
                                  if(rates.length > 0){
                                    bet.returnRate = rates[0].returnRate;
                                    earnings = rates[0].returnRate * bet.betCoins;
-                                   query = "select * from users where userId = " + bet.userId;
-                                   connection.query(query, function(err, userRow){
-                                        if(err)
-                                            df.reject(errorFunction(err));
-                                        earnings = rates[0].returnRate * bet.betCoins;
-                                        userRow[0].userCoins = userRow[0].userCoins + earnings;
-                                        query = "update users set ? where userId = " + bet.userId;
-                                        connection.query(query, userRow[0], function(err, updateResult){
-                                           if(err)
-                                               df.reject(errorFunction(err));
-                                               data = {
-                                                       "Type" : "WIN_NOTIFICATION",
-                                                       "Draw" : input.drawDateTime,
-                                                       "Matches" : bet.matches,
-                                                       "Earnings" : earnings
-                                               }
-                                               sendPushNotification(data, userRow[0].regId);
-                                        });
-                                   });
                                    input.drawInfo.winningBets++;
                                    input.drawInfo.betsOutcome += earnings;
                                    input.drawInfo.betsIncome += bet.betCoins;
@@ -293,65 +226,29 @@ exports.startDrawer = function(drawDate){
                        });
                    }
                });
-
           });
           return df.promise;
     }
 
-    function sendPushNotification(data, regId){
-           console.log("sending push notification");
-           // or with object values
-           var message = new gcm.Message({
-               collapseKey: 'Kimo',
-               delayWhileIdle: true,
-               timeToLive: 3,
-               data: data
-           });
-
-           var sender = new gcm.Sender('AIzaSyA9YQF4JjDURGyadtNfzvSDe2lWPbB2XII');
-           regIds = [];
-           regIds.push(regId);
-           sender.send(message, regIds, 4, function (err, result) {
-               if(err)
-                   console.log(err);
-           });
-    }
 
     function updateBets(input){
         console.log("========= updating bets");
         df = new Q.defer()
-        bets = input.bets;
-        bets.forEach(function(bet, index){
-            delete bet.id;
-//            console.log(input)
-            bet.drawTimeStamp = input.drawDateTime;
-            query="insert into bets_archive set ?";
-            connection.query(query, bet, function(err, insertResult)     {
-                if(err)
-                    console.log("Could not insert betId " + bet.betId + " " + err);
-                    if (bet.repeatedDraws == bet.draws){
-                        query="delete from active_bets where betId = " + bet.betId;
-                        connection.query(query, function(err, insertResult)     {
-                            if(err)
-                                console.log("Could not delete betId " + bet.betId + " " + err);
-                                if(index + 1 == bets.length) {
-                                       df.resolve(input);
-                                }
-                        });
-                    } else {
-                        query="update active_bets set ? where betId = " + bet.betId;
-                        connection.query(query, bet, function(err, insertResult)     {
-                            if(err)
-                                console.log("Could not update betId " + bet.betId + " " + err);
-                                if(index + 1 == bets.length) {
-                                       df.resolve(input);
-                                }
-                        });
-                    }
+        if (bets.length != 0){
+            bets = {bets: input.bets};
+            functions.httpPost("PUT", authorization, '/drawer/updateBets', JSON.stringify(bets),
+            function(data){
+                response += data;
+            },
+            function(end){
+              input.bets = response.bets;
+              input.drawInfo.bets = response.bets.length;
+              df.resolve(input);
+            },
+            function(error){
+                df.reject(error);
             });
-
-        });
-        if (bets.length == 0){
+        } else {
             df.resolve(input);
         }
         return df.promise;
@@ -360,11 +257,11 @@ exports.startDrawer = function(drawDate){
     function storeDrawInfo(input){
         df = new Q.defer();
         values = {
-                    drawDateTime: input.drawInfo.drawDateDime,
-                    bets: input.drawInfo.bets,
-                    winningBets: input.drawInfo.winningBets,
-                    betsIncome: input.drawInfo.betsIncome,
-                    betsOutcome: input.drawInfo.betsOutcome
+            drawDateTime: input.drawInfo.drawDateDime,
+            bets: input.drawInfo.bets,
+            winningBets: input.drawInfo.winningBets,
+            betsIncome: input.drawInfo.betsIncome,
+            betsOutcome: input.drawInfo.betsOutcome
         }
         connection.query("insert into draw_info set ?", values, function(err, insertResult) {
             if(err)
@@ -375,10 +272,12 @@ exports.startDrawer = function(drawDate){
         return df.promise;
     }
 
+
+
 function makeDraw (drawDate){
      console.log("in the drawer");
      Q().then(function(result){
-            return saveNextDraw(drawDate);
+            return saveNextDrawDate(drawDate);
      }).then(function(result){
             return newDraw(result);
      }).then(function(result){
@@ -396,4 +295,3 @@ function makeDraw (drawDate){
         console.log("========= error ", error);
     });
 }
-

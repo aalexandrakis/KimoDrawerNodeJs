@@ -28,6 +28,69 @@ fromEuroToIsoWithDelimiters: function(dateString){
 			var regExp = /(\d{2})(\d{2})(\d{4})(\d{2})(\d{2})/;
 			dateArray = regExp.exec(dateString);
 			return dateArray[3] + "-" + dateArray[2] + "-" + dateArray[1] + " " + dateArray[4] + ":" + dateArray[5];
+},
+
+httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
+    console.log('Http " + method + " Function ' + url + ' ' + data);
+    http = require('http');
+    options = {
+        host: process.env.OPENSHIFT_KIMO_IP,
+        port: process.env.OPENSHIFT_KIMO_PORT,
+        path: url,
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + authorization,
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+    newReq = http.request(options, function(newRes) {
+        newRes.setEncoding('utf8');
+        newRes.on('data', function (result) {
+            dataCallBack(result);
+        });
+        newRes.on('end', function (result) {
+            endCallBack(result);
+        });
+    });
+    newReq.on('error', function(error){
+        errorCallBack(error);
+    });
+    newReq.write(data);
+    newReq.end();
+},
+
+httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
+    console.log('Http Get Function ' + url + '/' + data);
+
+    http = require('http');
+    options = {
+        host: process.env.OPENSHIFT_KIMO_IP,
+        port: process.env.OPENSHIFT_KIMO_PORT,
+        path: url + "/" + data,
+        method: "GET",
+        headers: {
+            'Authorization': 'Basic ' + authorization,
+            'Content-Type': 'application/json'
+        }
+    };
+    newReq = http.request(options, function(newRes) {
+        newRes.setEncoding('utf8');
+        newRes.on('data', function (result) {
+            dataCallBack(result);
+        });
+        newRes.on('end', function (result) {
+            endCallBack(result);
+
+        });
+
+    });
+    newReq.on('error', function(error){
+        errorCallBack(error);
+    });
+    newReq.write(data);
+    newReq.end();
 }
+
 
 }
