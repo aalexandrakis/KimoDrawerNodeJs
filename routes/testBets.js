@@ -46,7 +46,7 @@ router.get('/:betsToCreate', function(req, res) {
 
 	function createBet(numbers){
 		 result = {};
-		 result.betDateTime = new Date();
+		 result.betDateTime = functions.convertDateToMySqlTimeStampString(new Date());
 		 result.betNumber1 = numbers[0];
 		 result.betNumber2 = numbers[1];
 		 result.betNumber3 = numbers[2];
