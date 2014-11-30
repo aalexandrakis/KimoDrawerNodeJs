@@ -94,8 +94,9 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
         }
     };
     newReq = http.request(options, function(newRes) {
-        newRes.setEncoding('utf8');
+        console.log("newRes ", newRes);
         newRes.on('data', function (result) {
+            console.log("result ", result);
             dataCallBack(result);
         });
         newRes.on('end', function (end) {
