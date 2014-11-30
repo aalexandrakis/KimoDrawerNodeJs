@@ -28,7 +28,7 @@ var distribution = Random.integer(1, 80);
 exports.makeOneDraw = function(){
 
          Q().then(function(result){
-                return newDraw(functions.convertDateToMySqlTimeStampString(new Date()));
+                return newDraw(functions.convertDateToMySqlTimeStampString(new Date()).toString());
          }).then(function(result){
                 return retrieveActiveBets(result);
          }).then(function(result){
@@ -81,7 +81,7 @@ exports.startDrawer = function(drawDate){
         df = new Q.defer();
         currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        globalNextDraw = functions.convertDateToIsoString(nextDraw);
+        globalNextDraw = functions.removeDateTimeDelimiters(nextDraw);
         console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
         nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
         var response="";
@@ -115,7 +115,7 @@ exports.startDrawer = function(drawDate){
             });
 
             result = {};
-            result.drawDateTime = new Date();
+            result.drawDateTime = functions.convertDateToMySqlTimeStampString(new Date()).toString();
             result.drawNumber1 = numbers[0];
             result.drawNumber2 = numbers[1];
             result.drawNumber3 = numbers[2];
@@ -163,7 +163,7 @@ exports.startDrawer = function(drawDate){
        numbers = [];
        df = new Q.defer();
        response = "";
-       functions.httpGet(authorization, '/drawer/retrieveActiveBets', functions.convertDateToIsoString(input.drawDateTime),
+       functions.httpGet(authorization, '/drawer/retrieveActiveBets', functions.fromIsoToEuroWithoutDelimiters(input.drawDateTime),
        function(data){
            response += data;
        },
@@ -202,6 +202,7 @@ exports.startDrawer = function(drawDate){
                    if  (indexNumbers == 11){
                        bet.draws++;
                        bet.matches = matches;
+                       bet.drawTimeStamp = input.drawDateTime;
                        input.drawInfo.winningBets = 0;
                        input.drawInfo.betsIncome = 0;
                        input.drawInfo.betsOutcome = 0;
@@ -256,17 +257,17 @@ exports.startDrawer = function(drawDate){
     function storeDrawInfo(input){
         console.log("========= store draw info");
         df = new Q.defer();
-        values = {
-            drawDateTime: input.drawInfo.drawDateDime,
-            bets: input.drawInfo.bets,
-            winningBets: input.drawInfo.winningBets,
-            betsIncome: input.drawInfo.betsIncome,
-            betsOutcome: input.drawInfo.betsOutcome
-        }
-        connection.query("insert into draw_info set ?", values, function(err, insertResult) {
+//        values = {
+//            drawDateTime: input.drawInfo.drawDateDime,
+//            bets: input.drawInfo.bets,
+//            winningBets: input.drawInfo.winningBets,
+//            betsIncome: input.drawInfo.betsIncome,
+//            betsOutcome: input.drawInfo.betsOutcome
+//        }
+        connection.query("insert into draw_info set ?", input.drawInfo, function(err, insertResult) {
             if(err)
                 console.log("========= draw info not stored because of the following error : ", err);
-           console.log(input.drawInfo);
+           console.log("input " , input.drawInfo);
            df.resolve("========= Draw info inserted successfully");
         });
         return df.promise;
