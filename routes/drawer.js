@@ -24,6 +24,30 @@ var engine = Random.engines.mt19937().autoSeed();
 var distribution = Random.integer(1, 80);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
+exports.drawTimer = false;
+
+exports.globalNextDraw = null;
+
+exports.startDrawer = function(drawDate, diff){
+        console.log(drawDate);
+        globalNextDraw = functions.addDelimitersToIsoDate(drawDate);
+        console.log(globalNextDraw);
+        global.isDrawerActive = true;
+        console.log("Draw starts in ", ((diff / 1000) / 60));
+        timeout = setTimeout(function(){
+            console.log("drawerFired");
+            makeDraw(globalNextDraw);
+
+            drawTimer = setInterval(function(){
+                makeDraw(globalNextDraw);
+            }, 10000);
+
+            clearTimeout(timeout);
+        }, diff);
+
+        return {"status":200, "message":"Draw completed successfully successfully"};
+
+}
 
 exports.makeOneDraw = function(){
 
@@ -47,32 +71,30 @@ exports.makeOneDraw = function(){
         });
 }
 
-exports.drawTimer = false;
 
-exports.globalNextDraw = null;
 
-exports.startDrawer = function(drawDate, diff){
-//        nextDraw = getNextDraw()
-//        diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
-//        console.log(new Date(), '-', new Date(functions.fromEuroToIsoWithDelimiters(drawDate)), '=', diff);
-//        diff -= 60000;
-        globalNextDraw = drawDate;
-        global.isDrawerActive = true;
-        console.log("Draw starts in ", ((diff / 1000) / 60));
-        timeout = setTimeout(function(){
-            console.log("drawerFired");
-            makeDraw(globalNextDraw);
-
-            drawTimer = setInterval(function(){
-                makeDraw(globalNextDraw);
-            }, 10000);
-
-            clearTimeout(timeout);
-        }, diff);
-
-        return {"status":200, "message":"Draw completed successfully successfully"};
-
+function makeDraw (drawDate){
+     console.log("in the drawer");
+     Q().then(function(){
+            return newDraw(drawDate);
+     }).then(function(result){
+            return saveNextDrawDate(result);
+     }).then(function(result){
+            return retrieveActiveBets(result);
+     }).then(function(result){
+            console.log("========= " + result.bets.length + " bets retrieved");
+            return checkBets(result);
+     }).then(function(result){
+            return updateBets(result);
+     }).then(function(result){
+            return storeDrawInfo(result);
+    }).then(function(result){
+         console.log(result);
+    }).catch(function(error){
+        console.log("========= error ", error);
+    });
 }
+
 
     function errorFunction(err){
         error = new Error();
@@ -81,33 +103,8 @@ exports.startDrawer = function(drawDate, diff){
         return error;
     }
 
-    //save next draw + 5 minutes
-    function saveNextDrawDate(currentDraw){
-        df = new Q.defer();
-        currentDraw = new Date(currentDraw.substring(0,4), currentDraw.substring(4,6), currentDraw.substring(6,8),
-                               currentDraw.substring(8,10),currentDraw.substring(10,12),currentDraw.substring(12,14));
-        console.log(currentDraw);
-        nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        globalNextDraw = functions.convertDateToIsoString(nextDraw);
-        console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
-        nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
-        var response="";
-        data = {'nextDrawString': nextDrawString};
-        functions.httpPost("PUT", authorization, '/drawer/saveNextDrawDate', JSON.stringify(data),
-        function(data){
-            response += data;
-        },
-        function(end){
-            df.resolve({'currentDraw':currentDraw, 'nextDraw':nextDraw});
-        },
-        function(error){
-            df.reject(error);
-        });
-        return df.promise;
-    }
-
     //Create and save new draw
-    function newDraw(input){
+    function newDraw(drawDate){
        console.log("========= create draw ");
        numbers = [];
        df = new Q.defer();
@@ -122,7 +119,7 @@ exports.startDrawer = function(drawDate, diff){
             });
 
             result = {};
-            result.drawDateTime = functions.convertDateToMySqlTimeStampString(new Date()).toString();
+            result.drawDateTime = drawDate;
             result.drawNumber1 = numbers[0];
             result.drawNumber2 = numbers[1];
             result.drawNumber3 = numbers[2];
@@ -163,6 +160,30 @@ exports.startDrawer = function(drawDate, diff){
        }
        return df.promise;
    }
+
+    //save next draw + 5 minutes
+    function saveNextDrawDate(input){
+        df = new Q.defer();
+        currentDraw = input.drawDateTime;
+        currentDraw = new Date(currentDraw.substring(0,4), currentDraw.substring(5,7) - 1, currentDraw.substring(8,10),
+                               currentDraw.substring(11,13),currentDraw.substring(14,16),currentDraw.substring(17,19));
+        nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
+        globalNextDraw = functions.convertDateToMySqlTimeStampString(nextDraw);
+        console.log("Current Draw:",currentDraw, "Next draw:", globalNextDraw);
+        var response="";
+        data = {'nextDrawString': globalNextDraw};
+        functions.httpPost("PUT", authorization, '/drawer/saveNextDrawDate', JSON.stringify(data),
+        function(data){
+            response += data;
+        },
+        function(end){
+            df.resolve(input);
+        },
+        function(error){
+            df.reject(error);
+        });
+        return df.promise;
+    }
 
    //retrieve bets
    function retrieveActiveBets(input){
@@ -281,25 +302,3 @@ exports.startDrawer = function(drawDate, diff){
     }
 
 
-
-function makeDraw (drawDate){
-     console.log("in the drawer");
-     Q().then(function(result){
-            return saveNextDrawDate(drawDate);
-     }).then(function(result){
-            return newDraw(result);
-     }).then(function(result){
-            return retrieveActiveBets(result);
-     }).then(function(result){
-            console.log("========= " + result.bets.length + " bets retrieved");
-            return checkBets(result);
-     }).then(function(result){
-            return updateBets(result);
-     }).then(function(result){
-            return storeDrawInfo(result);
-    }).then(function(result){
-         console.log(result);
-    }).catch(function(error){
-        console.log("========= error ", error);
-    });
-}

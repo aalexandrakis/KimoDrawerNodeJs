@@ -18,6 +18,12 @@ convertDateToIsoString : function(timestamp){
                                          (timestamp.getSeconds() < 10 ? "0" + timestamp.getSeconds() : timestamp.getSeconds()).toString();
                                     },
 
+addDelimitersToIsoDate : function(timestamp){
+                         return timestamp.substring(0,4)+"-"+timestamp.substring(4,6)+"-"+timestamp.substring(6,8)+" "+
+                                timestamp.substring(8,10)+":"+timestamp.substring(10,12)+":"+timestamp.substring(12,14);
+},
+
+
 fromIsoToEuro: function(dateString){
 		var regExp = /(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).*/;
 		dateArray = regExp.exec(dateString);
