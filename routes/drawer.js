@@ -40,7 +40,7 @@ exports.startDrawer = function(drawDate, diff){
 
             drawTimer = setInterval(function(){
                 makeDraw(globalNextDraw);
-            }, 10000);
+            }, 300000);
 
             clearTimeout(timeout);
         }, diff);
