@@ -29,9 +29,7 @@ exports.drawTimer = false;
 exports.globalNextDraw = null;
 
 exports.startDrawer = function(drawDate, diff){
-        console.log(drawDate);
         globalNextDraw = functions.addDelimitersToIsoDate(drawDate);
-        console.log(globalNextDraw);
         global.isDrawerActive = true;
         console.log("Draw starts in ", ((diff / 1000) / 60));
         timeout = setTimeout(function(){
