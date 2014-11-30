@@ -54,6 +54,7 @@ exports.globalNextDraw = null;
 exports.startDrawer = function(drawDate){
 //        nextDraw = getNextDraw()
         diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
+        console.log(new Date(), '-', new Date(functions.fromEuroToIsoWithDelimiters(drawDate), '=', diff);
 //        diff -= 60000;
         globalNextDraw = drawDate;
         global.isDrawerActive = true;
@@ -81,7 +82,7 @@ exports.startDrawer = function(drawDate){
         df = new Q.defer();
         currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        globalNextDraw = functions.removeDateTimeDelimiters(nextDraw);
+        globalNextDraw = functions.fromIsoToEuroWithoutDelimiters(nextDraw);
         console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
         nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
         var response="";
