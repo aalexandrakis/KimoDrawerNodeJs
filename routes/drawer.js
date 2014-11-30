@@ -51,21 +51,25 @@ exports.drawTimer = false;
 
 exports.globalNextDraw = null;
 
-exports.startDrawer = function(drawDate){
+exports.startDrawer = function(drawDate, diff){
 //        nextDraw = getNextDraw()
-        diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
-        console.log(new Date(), '-', new Date(functions.fromEuroToIsoWithDelimiters(drawDate)), '=', diff);
+//        diff = new Date() - new Date(functions.fromEuroToIsoWithDelimiters(drawDate));
+//        console.log(new Date(), '-', new Date(functions.fromEuroToIsoWithDelimiters(drawDate)), '=', diff);
 //        diff -= 60000;
         globalNextDraw = drawDate;
         global.isDrawerActive = true;
+        console.log("Draw starts in ", ((diff / 1000) / 60));
         timeout = setTimeout(function(){
-            console.log("Draw starts in ", ((diff / 1000) / 60));
+            console.log("drawerFired");
+            makeDraw(globalNextDraw);
+
+            drawTimer = setInterval(function(){
+                makeDraw(globalNextDraw);
+            }, 10000);
+
             clearTimeout(timeout);
         }, diff);
 
-        drawTimer = setInterval(function(){
-                makeDraw(globalNextDraw);
-        }, 300000);
         return {"status":200, "message":"Draw completed successfully successfully"};
 
 }
@@ -80,9 +84,11 @@ exports.startDrawer = function(drawDate){
     //save next draw + 5 minutes
     function saveNextDrawDate(currentDraw){
         df = new Q.defer();
-        currentDraw = new Date(functions.fromEuroToIsoWithDelimiters(currentDraw));
+        currentDraw = new Date(currentDraw.substring(0,4), currentDraw.substring(4,6), currentDraw.substring(6,8),
+                               currentDraw.substring(8,10),currentDraw.substring(10,12),currentDraw.substring(12,14));
+        console.log(currentDraw);
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        globalNextDraw = functions.fromIsoToEuroWithoutDelimiters(nextDraw);
+        globalNextDraw = functions.convertDateToIsoString(nextDraw);
         console.log("next draw in save draw ", nextDraw, " ", globalNextDraw);
         nextDrawString = functions.convertDateToMySqlTimeStampString(nextDraw);
         var response="";

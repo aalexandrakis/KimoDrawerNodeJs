@@ -20,8 +20,8 @@ router.get(/\/stopDrawer/, function(req, res) {
 	res.status(200).send("Drawer stopped successfully");
 });
 
-router.get('/startDrawer/:drawDate', function(req, res) {
-	global.drawer.startDrawer(req.params['drawDate']);
+router.get('/startDrawer/:drawDate/:diff', function(req, res) {
+	global.drawer.startDrawer(req.params.drawDate, req.params.diff);
 	res.status(200).send("Drawer Started Successfully");
 });
 
