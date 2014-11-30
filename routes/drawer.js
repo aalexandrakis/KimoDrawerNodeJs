@@ -49,10 +49,10 @@ exports.startDrawer = function(drawDate, diff){
 
 }
 
-exports.makeOneDraw = function(){
+exports.makeOneDraw = function(drawDate){
 
          Q().then(function(result){
-                return newDraw(functions.convertDateToMySqlTimeStampString(new Date()).toString());
+                return newDraw(functions.addDelimitersToIsoDate(drawDate));
          }).then(function(result){
                 return retrieveActiveBets(result);
          }).then(function(result){

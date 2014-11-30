@@ -29,7 +29,7 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
 
   $scope.makeOneDraw = function(){
       $http({
-             url: '/drawerService/makeOneDraw',
+             url: '/drawerService/makeOneDraw/' + moment().format("YYYYMMDDHHmmss"),
              method: "GET"
          })
        .then(function (response){
