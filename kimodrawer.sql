@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.10deb1
+-- version 4.0.10.6
 -- http://www.phpmyadmin.net
 --
--- Host: localhost
--- Generation Time: Nov 29, 2014 at 05:28 PM
--- Server version: 5.5.40-0ubuntu0.14.04.1
--- PHP Version: 5.5.9-1ubuntu4.5
+-- Host: 127.8.89.2:3306
+-- Generation Time: Nov 30, 2014 at 12:14 AM
+-- Server version: 5.5.40
+-- PHP Version: 5.3.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -19,7 +19,7 @@ SET time_zone = "+00:00";
 --
 -- Database: `kimodrawer`
 --
-CREATE DATABASE IF NOT EXISTS `kimodrawer` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `kimodrawer` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `kimodrawer`;
 
 -- --------------------------------------------------------
@@ -49,7 +49,7 @@ INSERT INTO `admins` (`adminEmail`, `adminPass`) VALUES
 
 DROP TABLE IF EXISTS `draw_info`;
 CREATE TABLE IF NOT EXISTS `draw_info` (
-  `drawDateTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `drawDateTime` char(19) COLLATE utf8_unicode_ci NOT NULL,
   `bets` bigint(20) NOT NULL,
   `winningBets` bigint(20) NOT NULL,
   `betsIncome` double NOT NULL,
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS `draw_info` (
 --
 
 INSERT INTO `draw_info` (`drawDateTime`, `bets`, `winningBets`, `betsIncome`, `betsOutcome`) VALUES
-('2014-11-20 19:00:59', 15, 3, 158.5, 13400),
-('2014-11-20 19:02:12', 12, 1, 25, 3125);
+('2014-11-20 14:00:59', 15, 3, 158.5, 13400),
+('2014-11-20 14:02:12', 12, 1, 25, 3125);
 
 -- --------------------------------------------------------
 
