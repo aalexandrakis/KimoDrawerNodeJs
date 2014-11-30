@@ -12,7 +12,6 @@ var Drawer = require('./routes/drawer');
 var signIn = require('./routes/signIn');
 var signOut = require('./routes/signOut');
 var testBets = require('./routes/testBets');
-var tests = require('./routes/tests');
 var drawerService = require('./routes/drawerService');
 var lastDraw = require('./routes/lastDraw');
 var getDrawInfo = require('./routes/getDrawInfo');
@@ -54,14 +53,11 @@ app.use(function (req, res, next) {
   	}
 });
 
-
-
 app.use('/signIn', signIn);
 app.use('/signOut', signOut);
 app.use('/drawerService', drawerService);
 app.use('/lastDraw', lastDraw);
 app.use('/testBets', testBets);
-app.use('/tests', tests);
 app.use('/getDrawInfo', getDrawInfo);
 
 app.get('/', function(req, res){
