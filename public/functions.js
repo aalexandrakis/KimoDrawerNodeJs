@@ -87,7 +87,7 @@ httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCal
             'Authorization': 'Basic ' + authorization,
             'Connection': 'keep-alive',
             'accept':'text/html;application/json',
-            'accept-encoding':'gzip, deflate, sdch',
+            'accept-encoding':'deflate',
             'accept-language': 'en-US,en;q=0.8',
             'content-type': 'text/plain',
             'content-length':0
