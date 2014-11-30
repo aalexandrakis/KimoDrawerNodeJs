@@ -238,12 +238,12 @@ function makeDraw (drawDate){
                                  df.reject(errorFunction(err));
                              } else {
                                  earnings = 0;
+                                 input.drawInfo.betsIncome += bet.betCoins;
                                  if(rates.length > 0){
                                    bet.returnRate = rates[0].returnRate;
                                    earnings = rates[0].returnRate * bet.betCoins;
                                    input.drawInfo.winningBets++;
                                    input.drawInfo.betsOutcome += earnings;
-                                   input.drawInfo.betsIncome += bet.betCoins;
                                  } else {
                                    bet.returnRate = 0;
                                  }
