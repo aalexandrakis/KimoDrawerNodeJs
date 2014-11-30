@@ -48,9 +48,9 @@
             </div>
               <div  style="z-index:9999;position:absolute;top:150;right:0;">
                   <div ng-repeat="alert in alerts">
-                      <div class="alert alert-success alert-dismissable" >
+                      <div ng-class=alert.class>
                           <button type="button" class="close" ng-click="removeAlert($index)">×</button>
-                          {{alert}}
+                          {{alert.message}}
                       </div>
                   </div>
               </div>

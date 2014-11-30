@@ -6,6 +6,9 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
   $scope.lazyLoadStyle = {"display" : "none"};
   $scope.tableStyle = {"display":"none"};
 
+  successClass = ["alert", "alert-success", "alert-dismissable"];
+  unsuccessClass = ["alert", "alert-danger", "alert-dismissable"];
+
   getDrawer();
 
   $scope.removeAlert = function(index){
@@ -31,8 +34,10 @@ kimoApp.controller("DrawerController", function drawerController($scope, $cookie
          })
        .then(function (response){
               if (response.status == 200){
-                  $scope.alerts.push(response.data);
+                  $scope.alerts.push({class:successClass, status:200, message:new Date() + " " + response.data});
               }
+       },function (response){
+                       $scope.alerts.push({class:unsuccessClass, status:500, message:new Date() + " " + response.data});
        });
   }
 
@@ -42,7 +47,9 @@ $scope.createTestBets = function(){
              method: "GET"
          })
        .then(function (response){
-              $scope.alerts.push(response.data);
+              $scope.alerts.push({class:successClass, status:200, message:new Date() + " " + response.data});
+       },function (response){
+               $scope.alerts.push({class:unsuccessClass, status:500, message:new Date() + " " + response.data});
        });
   }
 
@@ -68,9 +75,11 @@ $scope.createTestBets = function(){
          })
        .then(function (response){
               if (response.status == 200){
-                  $scope.alerts.push(response.data);
+                  $scope.alerts.push({class:successClass, status:200, message:new Date() + " " + response.data});
                   $scope.isDrawerActive = true;
               }
+       },function (response){
+               $scope.alerts.push({class:unsuccessClass, status:500, message:new Date() + " " + response.data});
        });
   }
 
@@ -81,9 +90,11 @@ $scope.createTestBets = function(){
            })
          .then(function (response){
                 if (response.status == 200){
-                    $scope.alerts.push(response.data);
+                    $scope.alerts.push({class:successClass, status:200, message:new Date() + " " + response.data});
                     $scope.isDrawerActive = false;
                 }
+         },function (response){
+                         $scope.alerts.push({class:unsuccessClass, status:500, message:new Date() + " " + response.data});
          });
   }
 
