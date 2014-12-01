@@ -72,6 +72,37 @@ httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, 
     newReq.end();
 },
 
+httpPostOnline: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
+    http = require('http');
+    options = {
+//        hostname: process.env.KIMO_HOST_NAME,
+//        port: process.env.KIMO_PORT || '',
+        hostname: 'kimo-aalexandrakis.rhcloud.com',
+        port: '',
+        path: url,
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + authorization,
+            'Content-Length': Buffer.byteLength(data)
+        }
+    };
+    newReq = http.request(options, function(newRes) {
+        newRes.setEncoding('utf8');
+        newRes.on('data', function (result) {
+            dataCallBack(result);
+        });
+        newRes.on('end', function (result) {
+            endCallBack(result);
+        });
+    });
+    newReq.on('error', function(error){
+        errorCallBack(error);
+    });
+    newReq.write(data);
+    newReq.end();
+},
+
 httpGet: function(authorization, url, data, dataCallBack, endCallBack,  errorCallBack){
     http = require('http');
 //    http.get('http://kimo-aalexandrakis.rhcloud.com' + url + "/" + data, function(res){

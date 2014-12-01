@@ -7,6 +7,7 @@ var engine = Random.engines.mt19937().autoSeed();
 var distribution = Random.integer(1, 80);
 var multiplier = Random.integer(1, 20);
 var repeatedDraws = Random.integer(1, 12);
+var gameTypeRandom = Random.integer(3, 12);
 // generate a number that is guaranteed to be within [0, 99] without any particular bias.
 
 var crypto = require('crypto')
@@ -17,15 +18,21 @@ var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password
 /* GET login. */
 	setInterval(function(){
 		createBet(createRandomList());
-	}, 60000)
+	}, 60000);
 
 	//create random number list
 	function createRandomList(){
 		numbers = [];
+		gameType = gameTypeRandom(engine);
 		while (numbers.length != 12){
+
 			  number = distribution(engine);
-			  if (numbers.indexOf(number) == -1){
-				numbers.push(number);
+			  if (numbers.length < gameType){
+				  if (numbers.indexOf(number) == -1){
+					numbers.push(number);
+				  }
+			  } else {
+			  	  numbers.push(0);
 			  }
 			  if (numbers.length == 12){
 			  	console.log("numbers:", numbers);
@@ -36,7 +43,7 @@ var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password
 		 }
 	}
 
-	function createBet(numbers){
+	function createBet(numbers, gameType){
 		 result = {};
 		 result.betDateTime = functions.convertDateToMySqlTimeStampString(new Date());
 		 result.betNumber1 = numbers[0];
@@ -51,7 +58,7 @@ var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password
 		 result.betNumber10 = numbers[9];
 		 result.betNumber11 = numbers[10];
 		 result.betNumber12 = numbers[11];
-		 result.gameType = 12;
+		 result.gameType = gameType;
 		 result.multiplier = multiplier(engine);
 		 result.repeatedDraws = repeatedDraws(engine);
 		 result.drawTimeStamp = "";
@@ -64,7 +71,7 @@ var authorization = new Buffer(process.env.KIMO_DRAWER_USERNAME + ":" + password
 
 	function saveBet(bets){
 		var response="";
-		functions.httpPost("PUT", authorization, '/drawer/saveBets', JSON.stringify({bets: bets}),
+		functions.httpPostOnline("PUT", authorization, '/drawer/saveBets', JSON.stringify({bets: bets}),
 		function(data){
 			response += data;
 		},
