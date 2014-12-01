@@ -37,7 +37,6 @@ fromIsoToEuroWithoutDelimiters: function(dateString){
 },
 
 fromEuroToIsoWithDelimiters: function(dateString){
-			console.log(dateString);
 		    return dateString.substring(4,8) + "-" + dateString.substring(2,4) + "-" + dateString.substring(0,2) + " " +
                    dateString.substring(8,10) + ":" + dateString.substring(10,12)  + (dateString.length > 12 ? ":" + dateString.substring(12,14) : "");
 },
