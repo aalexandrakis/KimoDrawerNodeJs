@@ -37,10 +37,11 @@ fromIsoToEuroWithoutDelimiters: function(dateString){
 },
 
 fromEuroToIsoWithDelimiters: function(dateString){
-			var regExp = /(\d{2})(\d{2})(\d{4})(\d{2})(\d{2})(\d{2})/;
-			dateArray = regExp.exec(dateString);
-			return dateArray[3] + "-" + dateArray[2] + "-" + dateArray[1] + " " + dateArray[4] + ":" + dateArray[5];
+			console.log(dateString);
+		    return dateString.substring(4,8) + "-" + dateString.substring(2,4) + "-" + dateString.substring(0,2) + " " +
+                   dateString.substring(8,10) + ":" + dateString.substring(10,12)  + (dateString.length > 12 ? ":" + dateString.substring(12,14) : "");
 },
+
 
 
 httpPost: function(method, authorization, url, data, dataCallBack, endCallBack, errorCallBack){
