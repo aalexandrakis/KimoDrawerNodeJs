@@ -151,6 +151,7 @@ function makeDraw (drawDate){
               df.resolve(result);
             },
             function(error){
+                console.log(error);
                 df.reject(error);
             });
 
