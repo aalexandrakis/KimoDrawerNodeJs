@@ -38,9 +38,6 @@ CREATE TABLE IF NOT EXISTS `admins` (
 -- Dumping data for table `admins`
 --
 
-INSERT INTO `admins` (`adminEmail`, `adminPass`) VALUES
-('aalexandrakis@hotmail.com', 'c7cbb272f3b502923a668fafc3408910122e5011');
-
 -- --------------------------------------------------------
 
 --
