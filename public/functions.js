@@ -11,7 +11,7 @@ convertDateToMySqlTimeStampString : function(timestamp){
 
 convertDateToIsoString : function(timestamp){
                                          return (timestamp.getDate() < 10 ? "0" + timestamp.getDate() : timestamp.getDate()).toString() +
-                                         (timestamp.getMonth()< 10 ? ("0" + timestamp.getMonth()) : timestamp.getMonth() + 1).toString() +
+                                         (timestamp.getMonth()< 10 ? ("0" + timestamp.getMonth()) : timestamp.getMonth()).toString() +
                                          timestamp.getFullYear().toString() +
                                          (timestamp.getHours() < 10 ? "0" + timestamp.getHours() : timestamp.getHours()).toString() +
                                          (timestamp.getMinutes() < 10 ? "0" + timestamp.getMinutes() : timestamp.getMinutes()).toString()+
