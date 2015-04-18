@@ -34,7 +34,7 @@ exports.startDrawer = function(drawDate, diff){
         console.log("Draw starts in ", ((diff / 1000) / 60));
         timeout = setTimeout(function(){
             console.log("drawerFired");
-//            makeDraw(globalNextDraw);
+            makeDraw(globalNextDraw);
             drawTimer = setInterval(function(){
                 makeDraw(globalNextDraw);
             }, 300000);
