@@ -66,13 +66,14 @@ $scope.createTestBets = function(){
         regExp = /(\d{2}).(\d{2}).(\d{4}).(\d{2}).(\d{2})/;
         dateArray = regExp.exec($scope.startDate);
         scopeDate = new Date(dateArray[3], dateArray[2], dateArray[1], dateArray[4], dateArray[5], '00');
+        startDrawDate = new Date(dateArray[3], dateArray[2] - 1, dateArray[1], dateArray[4], dateArray[5], '00');
 //        console.log(scopeDate);
 //        diff = scopeDate - new Date() ;
 //        console.log(isoDate(scopeDate), '-', new Date(), '=', diff);
-        startDrawDate = moment([dateArray[1]], dateArray[2], dateArray[3], dateArray[4], dateArray[5], '00');
-        currentDate = moment();
-        diff = currentDate.diff(startDrawDate);
-        console.log(startDrawDate + " - " + currentDate, " - ", diff);
+        startDrawDate = moment(startDrawDate);
+        currentDate = moment(new Date());
+        diff = startDrawDate.diff(currentDate);
+        console.log(scopeDate + " - " + startDrawDate.toDate() + " - " + currentDate.toDate(), " - ", diff);
       $http({
              url: '/drawerService/startDrawer/' + isoDate(scopeDate) + "/" + diff * 1,
              method: "GET"
