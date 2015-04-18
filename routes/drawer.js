@@ -138,7 +138,7 @@ function makeDraw (drawDate){
             result.drawNumber18 = numbers[17];
             result.drawNumber19 = numbers[18];
             result.drawNumber20 = numbers[19];
-
+            console.log(result.drawDateDime);
             var response="";
             functions.httpPost("POST", authorization, '/drawer/saveDraw', JSON.stringify(result),
             function(data){
