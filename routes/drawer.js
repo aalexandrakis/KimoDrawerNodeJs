@@ -34,8 +34,7 @@ exports.startDrawer = function(drawDate, diff){
         console.log("Draw starts in ", ((diff / 1000) / 60));
         timeout = setTimeout(function(){
             console.log("drawerFired");
-            makeDraw(globalNextDraw);
-
+//            makeDraw(globalNextDraw);
             drawTimer = setInterval(function(){
                 makeDraw(globalNextDraw);
             }, 300000);
@@ -163,10 +162,9 @@ function makeDraw (drawDate){
     function saveNextDrawDate(input){
         df = new Q.defer();
         currentDraw = input.drawDateTime;
-        currentDraw = new Date(currentDraw.substring(0,4), currentDraw.substring(5,7), currentDraw.substring(8,10),
+        currentDraw = new Date(currentDraw.substring(0,4), (currentDraw.substring(5,7)-1), currentDraw.substring(8,10),
                                currentDraw.substring(11,13),currentDraw.substring(14,16),currentDraw.substring(17,19));
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
-        console.log("on save next draw" + nextDraw);
         globalNextDraw = functions.convertDateToMySqlTimeStampString(nextDraw);
         console.log("Current Draw:",currentDraw, "Next draw:", globalNextDraw);
         var response="";
