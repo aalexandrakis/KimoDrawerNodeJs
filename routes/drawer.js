@@ -138,7 +138,6 @@ function makeDraw (drawDate){
             result.drawNumber18 = numbers[17];
             result.drawNumber19 = numbers[18];
             result.drawNumber20 = numbers[19];
-            console.log(result.drawDateDime);
             var response="";
             functions.httpPost("POST", authorization, '/drawer/saveDraw', JSON.stringify(result),
             function(data){
@@ -164,10 +163,8 @@ function makeDraw (drawDate){
     function saveNextDrawDate(input){
         df = new Q.defer();
         currentDraw = input.drawDateTime;
-        console.log("on save next draw" + currentDraw);
         currentDraw = new Date(currentDraw.substring(0,4), currentDraw.substring(5,7), currentDraw.substring(8,10),
                                currentDraw.substring(11,13),currentDraw.substring(14,16),currentDraw.substring(17,19));
-        console.log("on save next draw" + currentDraw);
         nextDraw = new Date(currentDraw.getTime() + (5 * 60000));
         console.log("on save next draw" + nextDraw);
         globalNextDraw = functions.convertDateToMySqlTimeStampString(nextDraw);

@@ -1,6 +1,8 @@
 module.exports = {
 
 convertDateToMySqlTimeStampString : function(timestamp){
+                                         console.log("get date " + timestamp.getDate());
+                                         console.log("get month " + timestamp.getMonth());
                                          return timestamp.getFullYear().toString() + "-" +
                                          (timestamp.getMonth() < 10 ? ("0" + timestamp.getMonth() ) : (timestamp.getMonth())).toString() + "-"+
                                          (timestamp.getDate() < 10 ? "0" + timestamp.getDate() : timestamp.getDate()).toString() + " " +
