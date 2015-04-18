@@ -65,7 +65,7 @@ $scope.createTestBets = function(){
         console.log($scope.startDate);
         regExp = /(\d{2}).(\d{2}).(\d{4}).(\d{2}).(\d{2})/;
         dateArray = regExp.exec($scope.startDate);
-        scopeDate = new Date(dateArray[3], dateArray[2]-1, dateArray[1], dateArray[4], dateArray[5], '00');
+        scopeDate = new Date(dateArray[3], dateArray[2], dateArray[1], dateArray[4], dateArray[5], '00');
         diff = scopeDate - new Date() ;
         console.log(isoDate(scopeDate), '-', new Date(), '=', diff);
 

@@ -23,6 +23,10 @@ addDelimitersToIsoDate : function(timestamp){
                                 timestamp.substring(8,10)+":"+timestamp.substring(10,12)+":"+timestamp.substring(12,14);
 },
 
+addOneMonth : function(timestamp){
+             d = new Date(timestamp)
+             return d.setMonth(d.getMonth + 1);
+},
 
 fromIsoToEuro: function(dateString){
 		var regExp = /(\d{4}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).(\d{2}).*/;
@@ -77,7 +81,7 @@ httpPostOnline: function(method, authorization, url, data, dataCallBack, endCall
     options = {
 //        hostname: process.env.KIMO_HOST_NAME,
 //        port: process.env.KIMO_PORT || '',
-        hostname: 'kimo-aalexandrakis.rhcloud.com',
+        hostname: 'kimo.aalexandrakis.com',
         port: '',
         path: url,
         method: method,

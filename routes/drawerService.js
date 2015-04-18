@@ -22,6 +22,7 @@ router.get('/makeOneDraw/:drawDate', function(req, res) {
 });
 
 router.get('/startDrawer/:drawDate/:diff', function(req, res) {
+	console.log("test");
 	global.drawer.startDrawer(req.params.drawDate, req.params.diff);
 	res.status(200).send("Drawer Started Successfully");
 });
